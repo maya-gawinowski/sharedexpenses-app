@@ -1,0 +1,6 @@
+{
+  "payerId": "1",
+  "participantsIds": ["1", "2", "3", "4"],
+  "amount": 100,
+  "description": "For beers"
+}
