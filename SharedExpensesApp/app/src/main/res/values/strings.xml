@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">SharedExpensesApp</string>
+    <string name="app_name">Shared Expenses App</string>
+    <string name="group_page">Groups</string>
+    <string name="back_button">Back</string>
 </resources>
