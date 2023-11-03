@@ -9,9 +9,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.sharedexpensesapp.model.GroupItem
 
 @Composable
 fun GroupScreen(
+    options: List<GroupItem.GroupI>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -19,6 +21,11 @@ fun GroupScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "test text")
+        options.forEach { item ->
+            Column {
+                Text(text = item.name)
+                Text(text = item.description)
+            }
+        }
     }
 }
