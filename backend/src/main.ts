@@ -24,7 +24,7 @@ const group: Group = new Group(
   'This is a test group',
 );
 
-const groups = [group];
+let groups = [group];
 
 app.get('/status', (req: Request, res: Response) => {
   const status = {
@@ -76,4 +76,16 @@ app.post('/groups', (req: Request, res: Response) => {
   );
   groups.push(group);
   res.status(201).json(group);
+});
+app.delete('/groups/:groupId', (req: Request, res: Response) => {
+  const groupId = req.params.groupId;
+  if (groupId == 'undefined') {
+    res.status(404).send('Group Id missing');
+  }
+  const group = groups.find((g) => g.getId() === groupId);
+  if (!group) {
+    res.status(404).send('Group not found');
+  }
+  groups = groups.filter((item) => item != group);
+  res.status(200).send('Sucessfully deleted');
 });
