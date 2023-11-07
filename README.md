@@ -39,16 +39,7 @@ Debts are calculated automatically based on expenses, thus no POST debts method 
 
 ```json
 {
-  "users": [
-    {
-      "id": "1",
-      "name": "Luca"
-    },
-    {
-      "id": "2",
-      "name": "Maya"
-    }
-  ],
+  "userIds": ["1", "3"],
   "name": "group 1",
   "description": "test group"
 }
@@ -58,18 +49,7 @@ Debts are calculated automatically based on expenses, thus no POST debts method 
 - PUT `http://localhost:3000/groups/{groupId}` -> modify group (right now only by adding users)
 
 ```json
-{
-  "users": [
-    {
-      "id": "5",
-      "name": "Kiran"
-    },
-    {
-      "id": "6",
-      "name": "Marcin"
-    }
-  ]
-}
+{ "userIds": [1, 4] }
 ```
 
 ### To be implemented:
