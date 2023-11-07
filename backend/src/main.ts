@@ -65,5 +65,15 @@ app.get('/groups', (req: Request, res: Response) => {
   res.json(groups);
 });
 app.post('/groups', (req: Request, res: Response) => {
-  res.status(404).send('not implemented');
+  const groupData = req.body;
+  if (!groupData.users || !groupData.name) {
+    res.status(404).send('Users or group name missing');
+  }
+  const group = new Group(
+    groupData.users,
+    groupData.name,
+    groupData.description,
+  );
+  groups.push(group);
+  res.status(201).json(group);
 });
