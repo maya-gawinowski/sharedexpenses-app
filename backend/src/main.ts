@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import express, { Request, Response } from 'express';
 import { PORT } from './config';
 
@@ -12,12 +13,16 @@ app.listen(PORT, () => {
   console.log('Server listening on port:', PORT);
 });
 
-const group: Group = new Group([
-  { id: '1', name: 'Luca' } as User,
-  { id: '2', name: 'Maya' } as User,
-  { id: '3', name: 'Mitsch' } as User,
-  { id: '4', name: 'Manca' } as User,
-]);
+const group: Group = new Group(
+  [
+    { id: '1', name: 'Luca' } as User,
+    { id: '2', name: 'Maya' } as User,
+    { id: '3', name: 'Mitsch' } as User,
+    { id: '4', name: 'Manca' } as User,
+  ],
+  'Group 1',
+  'This is a test group',
+);
 
 const groups = [group];
 
@@ -55,4 +60,10 @@ app.post('/groups/:groupId/expenses', (req: Request, res: Response) => {
   }
   group.addExpense(expense);
   res.json(group.getExpenses());
+});
+app.get('/groups', (req: Request, res: Response) => {
+  res.json(groups);
+});
+app.post('/groups', (req: Request, res: Response) => {
+  res.status(404).send('not implemented');
 });
