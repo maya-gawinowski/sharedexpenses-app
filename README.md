@@ -55,6 +55,22 @@ Debts are calculated automatically based on expenses, thus no POST debts method 
 ```
 
 - DELETE `http://localhost:3000/groups/{groupId}`
+- PUT `http://localhost:3000/groups/{groupId}` -> modify group (right now only by adding users)
+
+```json
+{
+  "users": [
+    {
+      "id": "5",
+      "name": "Kiran"
+    },
+    {
+      "id": "6",
+      "name": "Marcin"
+    }
+  ]
+}
+```
 
 ### To be implemented:
 

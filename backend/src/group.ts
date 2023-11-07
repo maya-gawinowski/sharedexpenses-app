@@ -3,7 +3,7 @@ import { Debt, Expense, User } from './model';
 
 export class Group {
   private readonly id: string;
-  private readonly users: User[];
+  private users: User[];
   private debts: Debt[] = [];
   private expenses: Expense[] = [];
   private name: string = '';
@@ -40,7 +40,10 @@ export class Group {
   public getUsers() {
     return this.users;
   }
-
+  public addUsers(newUsers: User[]) {
+    this.users = this.users.concat(newUsers);
+    return newUsers;
+  }
   public getDebts() {
     return this.debts;
   }
@@ -58,7 +61,7 @@ export class Group {
   public getDescription() {
     return this.description;
   }
-  public chanbgeDescription(description: string) {
+  public changeDescription(description: string) {
     this.description = description;
     return this.description;
   }

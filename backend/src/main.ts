@@ -65,6 +65,7 @@ app.get('/groups', (req: Request, res: Response) => {
   res.json(groups);
 });
 app.post('/groups', (req: Request, res: Response) => {
+  // create Group
   const groupData = req.body;
   if (!groupData.users || !groupData.name) {
     res.status(404).send('Users or group name missing');
@@ -77,11 +78,18 @@ app.post('/groups', (req: Request, res: Response) => {
   groups.push(group);
   res.status(201).json(group);
 });
+app.put('/groups/:groupId', (req: Request, res: Response) => {
+  const groupId = req.params.groupId;
+  const users: User[] = req.body.users;
+  const group = groups.find((g) => g.getId() === groupId);
+  if (!group) {
+    res.status(404).send('Group not found');
+  }
+  group.addUsers(users);
+  res.status(200).json(group.getUsers());
+});
 app.delete('/groups/:groupId', (req: Request, res: Response) => {
   const groupId = req.params.groupId;
-  if (groupId == 'undefined') {
-    res.status(404).send('Group Id missing');
-  }
   const group = groups.find((g) => g.getId() === groupId);
   if (!group) {
     res.status(404).send('Group not found');
