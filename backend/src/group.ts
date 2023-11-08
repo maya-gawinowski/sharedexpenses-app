@@ -1,17 +1,24 @@
+/* eslint-disable prettier/prettier */
 import { Debt, Expense, User } from './model';
 
 export class Group {
   private readonly id: string;
-  private readonly users: User[];
+  private users: User[];
   private debts: Debt[] = [];
   private expenses: Expense[] = [];
+  private name: string = '';
+  private description: string = '';
 
   private static nextId: number = 0;
 
-  constructor(users: User[]) {
+  constructor(users: User[], name: string, description?: string) {
     this.users = users;
     this.id = Group.nextId.toString();
     Group.nextId += 1;
+    this.name = name;
+    if (description != 'undefined') {
+      this.description = description;
+    }
   }
 
   public addExpense(expense: Expense) {
@@ -33,7 +40,10 @@ export class Group {
   public getUsers() {
     return this.users;
   }
-
+  public addUsers(newUsers: User[]) {
+    this.users = this.users.concat(newUsers);
+    return newUsers;
+  }
   public getDebts() {
     return this.debts;
   }
@@ -41,7 +51,20 @@ export class Group {
   public getId() {
     return this.id;
   }
-
+  public getName() {
+    return this.name;
+  }
+  public changeName(name: string) {
+    this.name = name;
+    return this.name;
+  }
+  public getDescription() {
+    return this.description;
+  }
+  public changeDescription(description: string) {
+    this.description = description;
+    return this.description;
+  }
   private modifyDebt(debtorId: string, creditorId: string, amount: number) {
     return (
       this.tryExtendDebt(debtorId, creditorId, amount) ||
