@@ -1,5 +1,6 @@
 package com.example.sharedexpensesapp.ui.screens
 
+import android.graphics.fonts.FontStyle
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,8 +25,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,15 +53,17 @@ fun WelcomScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
                     .padding(5.dp)
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(8.dp)
+                        .padding(15.dp)
                 ) {
                     Column {
-                        Text(text = item.name)
+                        Text(
+                            text = item.name,
+                            fontWeight = FontWeight.Bold
+                        )
                         Text(text = item.description)
                     }
                     Spacer(modifier = Modifier.weight(1f))
@@ -66,7 +71,6 @@ fun WelcomScreen(
                         Text(text = "click")
                     }
                 }
-
             }
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -120,7 +124,8 @@ fun choiceDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
-                .padding(16.dp),
+                .padding(16.dp)
+                .shadow(12.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
             Column(

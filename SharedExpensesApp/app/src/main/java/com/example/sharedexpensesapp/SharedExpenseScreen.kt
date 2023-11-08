@@ -3,6 +3,7 @@ package com.example.sharedexpensesapp
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,13 +18,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.sharedexpensesapp.datasource.DataSource
+import com.example.sharedexpensesapp.ui.screens.AccountScreen
 import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
 import com.example.sharedexpensesapp.ui.screens.GroupViewModel
@@ -35,7 +39,8 @@ enum class SharedExpenseScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
     Groups(title = R.string.group_page),
     Add(title = R.string.add_page),
-    Join(title = R.string.join_page)
+    Join(title = R.string.join_page),
+    Account(title = R.string.account_page)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,6 +49,7 @@ fun SharedExpenseBar(
     currentScreen: SharedExpenseScreen,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit = {},
+    navAccount: NavHostController,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -61,6 +67,18 @@ fun SharedExpenseBar(
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_button)
+                    )
+                }
+            }
+        },
+        actions = {
+            if (currentScreen == SharedExpenseScreen.Start) {
+                IconButton(onClick = { navAccount.navigate(SharedExpenseScreen.Account.name) }) {
+                    Icon(
+                        painter = painterResource(R.drawable.icon_account),
+                        contentDescription = "icon account",
+                        modifier = Modifier
+                            .size(50.dp)
                     )
                 }
             }
@@ -82,7 +100,8 @@ fun SharedExpenseApp() {
             SharedExpenseBar(
                 currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp() }
+                navigateUp = { navController.navigateUp() },
+                navAccount = navController,
             )
         }
     ) {innerPadding ->
@@ -128,6 +147,9 @@ fun SharedExpenseApp() {
                         .fillMaxSize()
                         .padding(innerPadding)
                 )
+            }
+            composable(route = SharedExpenseScreen.Account.name) {
+                AccountScreen()
             }
         }
     }

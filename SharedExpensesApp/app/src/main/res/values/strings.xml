@@ -4,4 +4,5 @@
     <string name="add_page">Add group</string>
     <string name="join_page">Join group</string>
     <string name="back_button">Back</string>
+    <string name="account_page">My Account</string>
 </resources>
