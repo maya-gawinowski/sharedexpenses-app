@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Shared Expenses App</string>
     <string name="group_page">Groups</string>
+    <string name="add_page">Add group</string>
+    <string name="join_page">Join group</string>
     <string name="back_button">Back</string>
 </resources>

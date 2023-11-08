@@ -24,14 +24,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.sharedexpensesapp.datasource.DataSource
+import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
 import com.example.sharedexpensesapp.ui.screens.GroupViewModel
+import com.example.sharedexpensesapp.ui.screens.JoinGroupScreen
 import com.example.sharedexpensesapp.ui.screens.WelcomScreen
 
 
 enum class SharedExpenseScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
-    Groups(title = R.string.group_page)
+    Groups(title = R.string.group_page),
+    Add(title = R.string.add_page),
+    Join(title = R.string.join_page)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -92,6 +96,12 @@ fun SharedExpenseApp() {
                     onStartOrderButtonClicked = {
                         navController.navigate(SharedExpenseScreen.Groups.name)
                     },
+                    onAddGroupButtonClicked = {
+                        navController.navigate(SharedExpenseScreen.Add.name)
+                    },
+                    onJoinGroupButtonClicked = {
+                        navController.navigate(SharedExpenseScreen.Join.name)
+                    },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
@@ -100,6 +110,20 @@ fun SharedExpenseApp() {
             composable(route = SharedExpenseScreen.Groups.name){
                 GroupScreen(
                     options = DataSource.groups,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
+            }
+            composable(route = SharedExpenseScreen.Add.name) {
+                AddGroupScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
+            }
+            composable(route = SharedExpenseScreen.Join.name) {
+                JoinGroupScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
