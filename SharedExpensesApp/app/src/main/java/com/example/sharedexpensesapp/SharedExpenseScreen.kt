@@ -17,7 +17,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,9 +29,8 @@ import com.example.sharedexpensesapp.datasource.DataSource
 import com.example.sharedexpensesapp.ui.screens.AccountScreen
 import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
-import com.example.sharedexpensesapp.ui.screens.GroupViewModel
 import com.example.sharedexpensesapp.ui.screens.JoinGroupScreen
-import com.example.sharedexpensesapp.ui.screens.WelcomScreen
+import com.example.sharedexpensesapp.ui.screens.WelcomeScreen
 
 
 enum class SharedExpenseScreen(@StringRes val title: Int) {
@@ -110,7 +108,7 @@ fun SharedExpenseApp() {
             startDestination = SharedExpenseScreen.Start.name,
         ) {
             composable(route = SharedExpenseScreen.Start.name){
-                WelcomScreen(
+                WelcomeScreen(
                     options = DataSource.groups,
                     onStartOrderButtonClicked = {
                         navController.navigate(SharedExpenseScreen.Groups.name)

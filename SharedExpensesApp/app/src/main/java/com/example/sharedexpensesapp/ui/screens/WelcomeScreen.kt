@@ -1,34 +1,27 @@
 package com.example.sharedexpensesapp.ui.screens
 
-import android.graphics.fonts.FontStyle
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +33,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,7 +43,7 @@ import com.example.sharedexpensesapp.model.GroupItem
 
 
 @Composable
-fun WelcomScreen(
+fun WelcomeScreen(
     onStartOrderButtonClicked: () -> Unit,
     onAddGroupButtonClicked: () -> Unit,
     onJoinGroupButtonClicked: () -> Unit,
@@ -72,7 +64,7 @@ fun WelcomScreen(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        groupList(options = options, onStartOrderButtonClicked = onStartOrderButtonClicked, modifier = Modifier.weight(12f))
+        GroupList(options = options, onStartOrderButtonClicked = onStartOrderButtonClicked, modifier = Modifier.weight(12f))
         Spacer(modifier = Modifier.weight(1f))
         Row {
             Spacer(modifier = Modifier.weight(1f))
@@ -96,7 +88,7 @@ fun WelcomScreen(
     }
     when {
         openDialog.value -> {
-            choiceDialog(
+            ChoiceDialog(
                 onDismissRequest = { openDialog.value = false },
                 onConfirmation = {
                     openDialog.value = false
@@ -113,7 +105,7 @@ fun WelcomScreen(
 }
 
 @Composable
-fun groupCard(group: GroupItem, modifier: Modifier = Modifier, onStartOrderButtonClicked: () -> Unit, ) {
+fun GroupCard(group: GroupItem, modifier: Modifier = Modifier, onStartOrderButtonClicked: () -> Unit, ) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -149,10 +141,10 @@ fun groupCard(group: GroupItem, modifier: Modifier = Modifier, onStartOrderButto
 }
 
 @Composable
-fun groupList(options: List<GroupItem.GroupI>, modifier: Modifier = Modifier, onStartOrderButtonClicked: () -> Unit,) {
+fun GroupList(options: List<GroupItem.GroupI>, modifier: Modifier = Modifier, onStartOrderButtonClicked: () -> Unit,) {
     LazyColumn(modifier = modifier) {
         items(options) { option ->
-            groupCard(
+            GroupCard(
                 group = option,
                 modifier = modifier.padding(8.dp),
                 onStartOrderButtonClicked = onStartOrderButtonClicked
@@ -162,7 +154,7 @@ fun groupList(options: List<GroupItem.GroupI>, modifier: Modifier = Modifier, on
 }
 
 @Composable
-fun choiceDialog(
+fun ChoiceDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     onAddGroupButtonClicked: () -> Unit,
