@@ -4,37 +4,43 @@ import com.example.sharedexpensesapp.model.GroupItem
 
 object DataSource {
     val groups = listOf(
-        GroupItem.GroupI(
+        GroupItem(
             name = "Group 1",
             description = "Description 1",
         ),
-        GroupItem.GroupI(
+        GroupItem(
             name = "Group 2",
             description = "Description 2",
         ),
-        GroupItem.GroupI(
+        GroupItem(
             name = "Group 3",
             description = "Description 3",
         ),
-        GroupItem.GroupI(
+        GroupItem(
             name = "Group 3",
             description = "Description 3",
-        ),GroupItem.GroupI(
+        ),
+        GroupItem(
             name = "Group 3",
             description = "Description 3",
-        ),GroupItem.GroupI(
+        ),
+        GroupItem(
             name = "Group 3",
             description = "Description 3",
-        ),GroupItem.GroupI(
+        ),
+        GroupItem(
             name = "Group 3",
             description = "Description 3",
-        ),GroupItem.GroupI(
+        ),
+        GroupItem(
             name = "Group 3",
             description = "Description 3",
-        ),GroupItem.GroupI(
+        ),
+        GroupItem(
             name = "Group 3",
             description = "Description 3",
-        ),GroupItem.GroupI(
+        ),
+        GroupItem(
             name = "Group 3",
             description = "Description 3",
         ),

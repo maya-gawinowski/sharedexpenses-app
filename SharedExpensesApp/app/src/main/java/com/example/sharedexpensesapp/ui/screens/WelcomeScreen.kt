@@ -23,8 +23,10 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -47,10 +49,10 @@ fun WelcomeScreen(
     onStartOrderButtonClicked: () -> Unit,
     onAddGroupButtonClicked: () -> Unit,
     onJoinGroupButtonClicked: () -> Unit,
-    options: List<GroupItem.GroupI>,
+    options: List<GroupItem>,
     modifier: Modifier = Modifier
 ) {
-    var openDialog = remember { mutableStateOf(false) }
+    var isDialogOpen by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.illustration_sans_titre_35),
@@ -64,15 +66,20 @@ fun WelcomeScreen(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        GroupList(options = options, onStartOrderButtonClicked = onStartOrderButtonClicked, modifier = Modifier.weight(12f))
+        GroupList(
+            options = options,
+            onStartOrderButtonClicked = onStartOrderButtonClicked,
+            modifier = Modifier.weight(12f)
+        )
         Spacer(modifier = Modifier.weight(1f))
         Row {
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                onClick = { openDialog.value = true },
+                onClick = { isDialogOpen = true },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.main_orange),
-                    contentColor = Color.White),
+                    contentColor = Color.White
+                ),
                 modifier = Modifier
                     .padding(10.dp)
 
@@ -87,11 +94,11 @@ fun WelcomeScreen(
         }
     }
     when {
-        openDialog.value -> {
+        isDialogOpen -> {
             ChoiceDialog(
-                onDismissRequest = { openDialog.value = false },
+                onDismissRequest = { isDialogOpen = false },
                 onConfirmation = {
-                    openDialog.value = false
+                    isDialogOpen = false
                     println("Confirmation registered") // Add logic here to handle confirmation.
                 },
                 dialogTitle = "Alert dialog example",
@@ -105,7 +112,11 @@ fun WelcomeScreen(
 }
 
 @Composable
-fun GroupCard(group: GroupItem, modifier: Modifier = Modifier, onStartOrderButtonClicked: () -> Unit, ) {
+fun GroupCard(
+    group: GroupItem,
+    modifier: Modifier = Modifier,
+    onStartOrderButtonClicked: () -> Unit,
+) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -141,7 +152,11 @@ fun GroupCard(group: GroupItem, modifier: Modifier = Modifier, onStartOrderButto
 }
 
 @Composable
-fun GroupList(options: List<GroupItem.GroupI>, modifier: Modifier = Modifier, onStartOrderButtonClicked: () -> Unit,) {
+fun GroupList(
+    options: List<GroupItem>,
+    modifier: Modifier = Modifier,
+    onStartOrderButtonClicked: () -> Unit,
+) {
     LazyColumn(modifier = modifier) {
         items(options) { option ->
             GroupCard(
@@ -194,7 +209,8 @@ fun ChoiceDialog(
                     onClick = onAddGroupButtonClicked,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(R.color.button_purple),
-                        contentColor = colorResource(R.color.main_purple)),
+                        contentColor = colorResource(R.color.main_purple)
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp)
@@ -205,7 +221,8 @@ fun ChoiceDialog(
                     onClick = onJoinGroupButtonClicked,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(R.color.button_purple),
-                        contentColor = colorResource(R.color.main_purple)),
+                        contentColor = colorResource(R.color.main_purple)
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp)

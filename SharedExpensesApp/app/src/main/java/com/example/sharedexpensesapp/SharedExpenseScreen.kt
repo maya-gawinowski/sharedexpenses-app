@@ -88,7 +88,6 @@ fun SharedExpenseBar(
 @Composable
 fun SharedExpenseApp() {
     val navController = rememberNavController()
-    //val viewModel: GroupViewModel = viewModel()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = SharedExpenseScreen.valueOf(
         backStackEntry?.destination?.route ?: SharedExpenseScreen.Start.name
@@ -102,12 +101,12 @@ fun SharedExpenseApp() {
                 navAccount = navController,
             )
         }
-    ) {innerPadding ->
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = SharedExpenseScreen.Start.name,
         ) {
-            composable(route = SharedExpenseScreen.Start.name){
+            composable(route = SharedExpenseScreen.Start.name) {
                 WelcomeScreen(
                     options = DataSource.groups,
                     onStartOrderButtonClicked = {
@@ -124,7 +123,7 @@ fun SharedExpenseApp() {
                         .padding(innerPadding)
                 )
             }
-            composable(route = SharedExpenseScreen.Groups.name){
+            composable(route = SharedExpenseScreen.Groups.name) {
                 GroupScreen(
                     options = DataSource.groups,
                     modifier = Modifier
