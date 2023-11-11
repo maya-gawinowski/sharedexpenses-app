@@ -46,11 +46,11 @@ import com.example.sharedexpensesapp.model.GroupItem
 
 @Composable
 fun WelcomeScreen(
-    onStartOrderButtonClicked: () -> Unit,
     onAddGroupButtonClicked: () -> Unit,
     onJoinGroupButtonClicked: () -> Unit,
-    options: List<GroupItem>,
-    modifier: Modifier = Modifier
+    onViewButtonClicked: () -> Unit,
+    groups: List<GroupItem>,
+    modifier: Modifier = Modifier,
 ) {
     var isDialogOpen by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -67,9 +67,9 @@ fun WelcomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         GroupList(
-            options = options,
-            onStartOrderButtonClicked = onStartOrderButtonClicked,
-            modifier = Modifier.weight(12f)
+            groups = groups,
+            modifier = Modifier.weight(12f),
+            onViewButtonClicked = onViewButtonClicked,
         )
         Spacer(modifier = Modifier.weight(1f))
         Row {
@@ -153,16 +153,20 @@ fun GroupCard(
 
 @Composable
 fun GroupList(
-    options: List<GroupItem>,
+    groups: List<GroupItem>,
     modifier: Modifier = Modifier,
-    onStartOrderButtonClicked: () -> Unit,
+    onViewButtonClicked: () -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
-        items(options) { option ->
+        items(groups) { group ->
             GroupCard(
-                group = option,
+                group = group,
                 modifier = modifier.padding(8.dp),
-                onStartOrderButtonClicked = onStartOrderButtonClicked
+                onStartOrderButtonClicked = {
+                    GroupViewModel.instance.setSelectedGroup(group)
+                    println(GroupViewModel.instance.selectedGroup.value)
+                    onViewButtonClicked()
+                }
             )
         }
     }
