@@ -28,6 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.sharedexpensesapp.datasource.DataSource
 import com.example.sharedexpensesapp.ui.screens.AccountScreen
+import com.example.sharedexpensesapp.ui.screens.AddExpenseScreen
 import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
 import com.example.sharedexpensesapp.ui.screens.GroupViewModel
@@ -40,7 +41,8 @@ enum class SharedExpenseScreen(@StringRes val title: Int) {
     Groups(title = R.string.group_page),
     Add(title = R.string.add_page),
     Join(title = R.string.join_page),
-    Account(title = R.string.account_page)
+    Account(title = R.string.account_page),
+    AddExpense(title = R.string.add_expense_page)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -143,6 +145,9 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.Join.name) {
                 JoinGroupScreen(
+                    onJoinGroupClicked = {
+                        navController.navigate(SharedExpenseScreen.AddExpense.name)
+                    },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
@@ -150,6 +155,13 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.Account.name) {
                 AccountScreen()
+            }
+            composable(route = SharedExpenseScreen.AddExpense.name) {
+                AddExpenseScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
             }
         }
     }
