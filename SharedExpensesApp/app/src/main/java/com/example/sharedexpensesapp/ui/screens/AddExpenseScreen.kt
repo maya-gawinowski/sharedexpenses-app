@@ -45,7 +45,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sharedexpensesapp.R
-import com.example.sharedexpensesapp.model.ListItem
+import com.example.sharedexpensesapp.datasource.DataSource
 import com.example.sharedexpensesapp.utils.CurrencyAmountInputVisualTransformation
 import com.example.sharedexpensesapp.utils.DropDownMenuStateHolder
 import com.example.sharedexpensesapp.utils.ReadonlyTextField
@@ -60,6 +60,7 @@ fun AddExpenseScreen(
     modifier: Modifier = Modifier,
     currencySymbol: String = "EUR"
 ) {
+    val users = DataSource.users
     var description by remember { mutableStateOf("") }
     var amountInput by remember { mutableStateOf("") }
     // date picker
@@ -72,17 +73,17 @@ fun AddExpenseScreen(
     }
     val dateDialogState = rememberMaterialDialogState()
     // dropdown menu
-    val users = listOf("User A", "User B", "User C", "User D", "User E", " User F", "User G")
     val dropDownMenuStateHolder = remember {
-        DropDownMenuStateHolder(users)
+        DropDownMenuStateHolder(users.map { user -> user.name })
     }
     // lazy list
     var participants by remember {
         mutableStateOf(
             users.map {
-                ListItem(
-                    title = it,
-                    isSelected = true
+                UserListItem(
+                    title = it.name,
+                    id = it.id,
+                    isSelected = true,
                 )
             }
         )
@@ -248,3 +249,9 @@ private fun PayerDropDownMenu(dropDownMenuStateHolder: DropDownMenuStateHolder) 
         }
     }
 }
+
+data class UserListItem (
+    val title: String,
+    val id: String,
+    val isSelected: Boolean,
+)
