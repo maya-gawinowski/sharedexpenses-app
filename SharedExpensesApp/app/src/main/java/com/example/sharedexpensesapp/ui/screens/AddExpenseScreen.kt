@@ -8,6 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +29,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.utils.CurrencyAmountInputVisualTransformation
+import com.example.sharedexpensesapp.utils.DropDownStateHolder
 import com.example.sharedexpensesapp.utils.ReadonlyTextField
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -32,6 +37,7 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(
     modifier: Modifier = Modifier,
@@ -39,6 +45,7 @@ fun AddExpenseScreen(
 ) {
     var description by remember { mutableStateOf("") }
     var amountInput by remember { mutableStateOf("") }
+    // date picker
     var pickedDate by remember { mutableStateOf(LocalDate.now()) }
     val formattedDate by remember {
         derivedStateOf {
@@ -47,6 +54,11 @@ fun AddExpenseScreen(
         }
     }
     val dateDialogState = rememberMaterialDialogState()
+    // dropdown menu
+    val items = listOf("User A", "User B", "User C", "User D", "User E", " User F")
+    val dropDownStateHolder = remember {
+        DropDownStateHolder(items)
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -74,7 +86,7 @@ fun AddExpenseScreen(
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             visualTransformation = CurrencyAmountInputVisualTransformation(),
-            suffix = { Text(currencySymbol) }
+            suffix = { Text(currencySymbol) },
         )
         Spacer(Modifier.size(16.dp))
         ReadonlyTextField(
@@ -83,6 +95,36 @@ fun AddExpenseScreen(
             onClick = { dateDialogState.show() },
         ) {
             Text(text = "Date")
+        }
+        Spacer(Modifier.size(16.dp))
+        ExposedDropdownMenuBox(
+            expanded = dropDownStateHolder.enabled,
+            onExpandedChange = { dropDownStateHolder.enabled = it }) {
+            OutlinedTextField(
+                value = dropDownStateHolder.value,
+                onValueChange = {},
+                label = { Text(text = "Payed by") },
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownStateHolder.enabled)
+                },
+                placeholder = {
+                    Text(text = "Payed by")
+                },
+                modifier = Modifier.menuAnchor(),
+            )
+            ExposedDropdownMenu(
+                expanded = dropDownStateHolder.enabled,
+                onDismissRequest = { dropDownStateHolder.enabled = false })
+            {
+                dropDownStateHolder.items.forEachIndexed { index, s ->
+                    DropdownMenuItem(
+                        text = { Text(text = s) },
+                        onClick = {
+                            dropDownStateHolder.select(index)
+                        })
+                }
+            }
         }
     }
     MaterialDialog(
@@ -100,4 +142,3 @@ fun AddExpenseScreen(
         }
     }
 }
-
