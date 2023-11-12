@@ -27,7 +27,6 @@ import com.example.sharedexpensesapp.R
 
 @Composable
 fun JoinGroupScreen(
-    onJoinGroupClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var text by remember { mutableStateOf("") }
@@ -52,7 +51,7 @@ fun JoinGroupScreen(
         )
         Spacer(Modifier.size(16.dp))
         Button(
-            onClick = onJoinGroupClicked,
+            onClick = { joinGroupClicked(text) },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary

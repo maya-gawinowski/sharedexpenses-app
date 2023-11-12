@@ -106,12 +106,12 @@ fun SharedExpenseApp() {
                 navAccount = navController,
             )
         }
-    ) {innerPadding ->
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = SharedExpenseScreen.Start.name,
         ) {
-            composable(route = SharedExpenseScreen.Start.name){
+            composable(route = SharedExpenseScreen.Start.name) {
                 WelcomScreen(
                     options = DataSource.groups,
                     onStartOrderButtonClicked = {
@@ -128,9 +128,11 @@ fun SharedExpenseApp() {
                         .padding(innerPadding)
                 )
             }
-            composable(route = SharedExpenseScreen.Groups.name){
+            composable(route = SharedExpenseScreen.Groups.name) {
                 GroupScreen(
-                    options = DataSource.groups,
+                    onAddExpenseButtonClicked = {
+                        navController.navigate(SharedExpenseScreen.AddExpense.name)
+                    },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
@@ -145,9 +147,6 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.Join.name) {
                 JoinGroupScreen(
-                    onJoinGroupClicked = {
-                        navController.navigate(SharedExpenseScreen.AddExpense.name)
-                    },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
