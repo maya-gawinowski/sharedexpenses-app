@@ -1,17 +1,30 @@
 package com.example.sharedexpensesapp.ui.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,14 +35,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.sharedexpensesapp.R
+import com.example.sharedexpensesapp.model.ListItem
 import com.example.sharedexpensesapp.utils.CurrencyAmountInputVisualTransformation
-import com.example.sharedexpensesapp.utils.DropDownStateHolder
+import com.example.sharedexpensesapp.utils.DropDownMenuStateHolder
 import com.example.sharedexpensesapp.utils.ReadonlyTextField
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -37,7 +55,6 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(
     modifier: Modifier = Modifier,
@@ -55,9 +72,20 @@ fun AddExpenseScreen(
     }
     val dateDialogState = rememberMaterialDialogState()
     // dropdown menu
-    val items = listOf("User A", "User B", "User C", "User D", "User E", " User F")
-    val dropDownStateHolder = remember {
-        DropDownStateHolder(items)
+    val users = listOf("User A", "User B", "User C", "User D", "User E", " User F", "User G")
+    val dropDownMenuStateHolder = remember {
+        DropDownMenuStateHolder(users)
+    }
+    // lazy list
+    var participants by remember {
+        mutableStateOf(
+            users.map {
+                ListItem(
+                    title = it,
+                    isSelected = true
+                )
+            }
+        )
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -77,7 +105,8 @@ fun AddExpenseScreen(
         OutlinedTextField(
             value = description,
             onValueChange = { description = it },
-            label = { Text("Expense description") }
+            label = { Text("Expense description") },
+            singleLine = true,
         )
         Spacer(Modifier.size(16.dp))
         OutlinedTextField(
@@ -87,6 +116,7 @@ fun AddExpenseScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             visualTransformation = CurrencyAmountInputVisualTransformation(),
             suffix = { Text(currencySymbol) },
+            singleLine = true,
         )
         Spacer(Modifier.size(16.dp))
         ReadonlyTextField(
@@ -97,36 +127,78 @@ fun AddExpenseScreen(
             Text(text = "Date")
         }
         Spacer(Modifier.size(16.dp))
-        ExposedDropdownMenuBox(
-            expanded = dropDownStateHolder.enabled,
-            onExpandedChange = { dropDownStateHolder.enabled = it }) {
-            OutlinedTextField(
-                value = dropDownStateHolder.value,
-                onValueChange = {},
-                label = { Text(text = "Payed by") },
-                readOnly = true,
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownStateHolder.enabled)
-                },
-                placeholder = {
-                    Text(text = "Payed by")
-                },
-                modifier = Modifier.menuAnchor(),
+        PayerDropDownMenu(dropDownMenuStateHolder)
+        Spacer(Modifier.size(16.dp))
+        Row (
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .fillMaxWidth(0.75f)
+        ){
+            Text(
+                text = "Split among:",
+                fontWeight = FontWeight.Bold,
             )
-            ExposedDropdownMenu(
-                expanded = dropDownStateHolder.enabled,
-                onDismissRequest = { dropDownStateHolder.enabled = false })
-            {
-                dropDownStateHolder.items.forEachIndexed { index, s ->
-                    DropdownMenuItem(
-                        text = { Text(text = s) },
-                        onClick = {
-                            dropDownStateHolder.select(index)
-                        })
+        }
+        Spacer(Modifier.size(16.dp))
+        LazyColumn(
+            modifier = Modifier
+                .weight(12f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            items(participants.size) { i ->
+                ElevatedCard (
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 6.dp
+                    ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = colorResource(R.color.card_orange),
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.75f)
+                        .padding(5.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                participants = participants.mapIndexed { j, item ->
+                                    if (i == j) {
+                                        item.copy(isSelected = !item.isSelected)
+                                    } else item
+                                }
+                            }
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = participants[i].title)
+                        if (participants[i].isSelected) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Selected",
+                                tint = Color(0xff3b6e44),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
+        Spacer(Modifier.size(16.dp))
+        Button(
+            onClick = { },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            modifier = Modifier
+                .padding(start = 10.dp, end = 10.dp)
+                .fillMaxWidth(0.75f)
+        ) {
+            Text(text = "Add expense", fontSize = 20.sp)
+        }
     }
+
     MaterialDialog(
         dialogState = dateDialogState,
         buttons = {
@@ -139,6 +211,40 @@ fun AddExpenseScreen(
             title = "Pick a date",
         ) {
             pickedDate = it
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun PayerDropDownMenu(dropDownMenuStateHolder: DropDownMenuStateHolder) {
+    ExposedDropdownMenuBox(
+        expanded = dropDownMenuStateHolder.expanded,
+        onExpandedChange = { dropDownMenuStateHolder.expanded = it }) {
+        OutlinedTextField(
+            value = dropDownMenuStateHolder.value,
+            onValueChange = {},
+            label = { Text(text = "Payed by") },
+            readOnly = true,
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownMenuStateHolder.expanded)
+            },
+            placeholder = {
+                Text(text = "Payed by")
+            },
+            modifier = Modifier.menuAnchor(),
+        )
+        ExposedDropdownMenu(
+            expanded = dropDownMenuStateHolder.expanded,
+            onDismissRequest = { dropDownMenuStateHolder.expanded = false })
+        {
+            dropDownMenuStateHolder.items.forEachIndexed { index, s ->
+                DropdownMenuItem(
+                    text = { Text(text = s) },
+                    onClick = {
+                        dropDownMenuStateHolder.select(index)
+                    })
+            }
         }
     }
 }
