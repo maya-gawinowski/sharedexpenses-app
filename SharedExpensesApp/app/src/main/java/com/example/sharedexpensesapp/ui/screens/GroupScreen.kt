@@ -2,18 +2,20 @@ package com.example.sharedexpensesapp.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.sharedexpensesapp.model.GroupItem
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun GroupScreen(
-    options: List<GroupItem.GroupI>,
+    onAddExpenseButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -21,11 +23,16 @@ fun GroupScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        options.forEach { item ->
-            Column {
-                Text(text = item.name)
-                Text(text = item.description)
-            }
+        Button(
+            onClick = onAddExpenseButtonClicked,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            modifier = Modifier
+                .padding(start = 10.dp, end = 10.dp)
+        ) {
+            Text(text = "Add expense", fontSize = 20.sp)
         }
     }
 }
