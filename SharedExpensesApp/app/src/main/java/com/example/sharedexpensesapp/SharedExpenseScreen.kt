@@ -153,7 +153,6 @@ fun SharedExpenseApp() {
             composable(route = SharedExpenseScreen.Groups.name) {
                 GroupScreen(
                     selectedGroup = selectedGroup,
-
                     onAddExpenseButtonClicked = {
                         navController.navigate(SharedExpenseScreen.AddExpense.name)
                     },
