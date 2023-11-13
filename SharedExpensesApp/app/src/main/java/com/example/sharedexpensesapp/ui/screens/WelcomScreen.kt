@@ -58,7 +58,7 @@ fun WelcomScreen(
     onAddGroupButtonClicked: () -> Unit,
     onJoinGroupButtonClicked: () -> Unit,
     onGroupSelected: (GroupItem) -> Unit,
-    options: List<GroupItem.GroupI>,
+    options: List<GroupItem>,
     modifier: Modifier = Modifier
 ) {
     var openDialog = remember { mutableStateOf(false) }
@@ -169,7 +169,7 @@ fun groupCard(
 
 @Composable
 fun groupList(
-    options: List<GroupItem.GroupI>,
+    options: List<GroupItem>,
     modifier: Modifier = Modifier,
     onStartOrderButtonClicked: () -> Unit,
     onGroupSelected: (GroupItem) -> Unit,

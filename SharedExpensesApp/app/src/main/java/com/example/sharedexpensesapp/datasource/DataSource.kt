@@ -6,7 +6,7 @@ import com.example.sharedexpensesapp.model.User
 
 object DataSource {
     val groups = listOf(
-        GroupItem.GroupI(
+        GroupItem(
             name = "Group Choufleur",
             description = "Description 1",
             balance = 123.4,
@@ -37,7 +37,7 @@ object DataSource {
             ),
             currency = "€"
         ),
-        GroupItem.GroupI(
+        GroupItem(
             name = "Group Carotte",
             description = "Description 2",
             balance = 123.4,
@@ -69,7 +69,7 @@ object DataSource {
             currency = "€"
 
         ),
-        GroupItem.GroupI(
+        GroupItem(
             name = "Group Meringue",
             description = "Description 3",
             balance = 123.4,
@@ -101,7 +101,7 @@ object DataSource {
             currency = "€"
 
         ),
-        GroupItem.GroupI(
+        GroupItem(
             name = "Group Souflé",
             description = "Description 3",
             balance = 123.4,
@@ -131,7 +131,7 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem.GroupI(
+        ),GroupItem(
             name = "Group Eiffel",
             description = "Description 3",
             balance = 123.4,
@@ -161,7 +161,7 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem.GroupI(
+        ),GroupItem(
             name = "Group MontPellier",
             description = "Description 3",
             balance = 123.4,
@@ -191,7 +191,7 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem.GroupI(
+        ),GroupItem(
             name = "Group Toulouse",
             description = "Description 3",
             balance = 123.4,
@@ -221,7 +221,7 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem.GroupI(
+        ),GroupItem(
             name = "Group Paris",
             description = "Description 3",
             balance = 123.4,
@@ -251,7 +251,7 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem.GroupI(
+        ),GroupItem(
             name = "Group Coloc",
             description = "Description 3",
             balance = 123.4,
@@ -281,7 +281,7 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem.GroupI(
+        ),GroupItem(
             name = "Group sous",
             description = "Description 3",
             balance = 123.4,
