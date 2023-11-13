@@ -35,6 +35,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sharedexpensesapp.datasource.DataSource
 import com.example.sharedexpensesapp.model.GroupItem
 import com.example.sharedexpensesapp.ui.screens.AccountScreen
+import com.example.sharedexpensesapp.ui.screens.AddExpenseScreen
 import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
 import com.example.sharedexpensesapp.ui.screens.GroupViewModel
@@ -129,7 +130,7 @@ fun SharedExpenseApp() {
             navController = navController,
             startDestination = SharedExpenseScreen.Start.name,
         ) {
-            composable(route = SharedExpenseScreen.Start.name){
+            composable(route = SharedExpenseScreen.Start.name) {
                 WelcomScreen(
                     options = DataSource.groups,
                     onStartOrderButtonClicked = {
@@ -149,9 +150,10 @@ fun SharedExpenseApp() {
                         .padding(innerPadding)
                 )
             }
-            composable(route = SharedExpenseScreen.Groups.name){
+            composable(route = SharedExpenseScreen.Groups.name) {
                 GroupScreen(
                     selectedGroup = selectedGroup,
+
                     onAddExpenseButtonClicked = {
                         navController.navigate(SharedExpenseScreen.AddExpense.name)
                     },
@@ -176,6 +178,13 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.Account.name) {
                 AccountScreen()
+            }
+            composable(route = SharedExpenseScreen.AddExpense.name) {
+                AddExpenseScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
             }
         }
     }
