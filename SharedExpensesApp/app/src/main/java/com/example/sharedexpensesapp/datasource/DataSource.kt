@@ -34,6 +34,42 @@ object DataSource {
                     description = "ttt",
                     date = "23/12/2023"
                 ),
+                ExpenseItem(
+                    participant = "User 1",
+                    amount = 124.56,
+                    description = "ttt",
+                    date = "23/12/2023"
+                ),
+                ExpenseItem(
+                    participant = "User 1",
+                    amount = 124.56,
+                    description = "ttt",
+                    date = "23/12/2023"
+                ),
+                ExpenseItem(
+                    participant = "User 1",
+                    amount = 124.56,
+                    description = "ttt",
+                    date = "23/12/2023"
+                ),
+                ExpenseItem(
+                    participant = "User 1",
+                    amount = 124.56,
+                    description = "ttt",
+                    date = "23/12/2023"
+                ),
+                ExpenseItem(
+                    participant = "User 1",
+                    amount = 124.56,
+                    description = "ttt",
+                    date = "23/12/2023"
+                ),
+                ExpenseItem(
+                    participant = "User 1",
+                    amount = 124.56,
+                    description = "ttt",
+                    date = "23/12/2023"
+                ),
             ),
             currency = "€"
         ),

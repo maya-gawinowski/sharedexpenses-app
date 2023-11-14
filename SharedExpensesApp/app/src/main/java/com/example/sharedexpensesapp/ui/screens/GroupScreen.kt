@@ -17,6 +17,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -54,6 +56,13 @@ fun GroupScreen(
         modifier = modifier,
     ) {
         ExpenseBar(selectedGroup = selectedGroup, modifier = modifier.fillMaxWidth())
+        LazyColumn(modifier = Modifier.weight(50f)) {
+            if (selectedGroup != null) {
+                items(selectedGroup.expenses) { expenseItem ->
+                    ExpenseCard(expense = expenseItem, selectedGroup = selectedGroup)
+                }
+            }
+        }
         Spacer(modifier = Modifier.weight(1f))
         Row {
             Spacer(modifier = Modifier.weight(1f))
@@ -118,13 +127,11 @@ fun ExpenseBar(
             )
         }
     }
-    selectedGroup?.expenses?.forEach { expenseItem ->
-        ExpenseCard(expense = expenseItem, selectedGroup = selectedGroup)
-    }
+
 }
 
 @Composable
-fun ExpenseCard(modifier: Modifier = Modifier, expense: ExpenseItem, selectedGroup: GroupItem) {
+fun ExpenseCard(modifier: Modifier = Modifier, expense: ExpenseItem, selectedGroup: GroupItem?) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -154,12 +161,14 @@ fun ExpenseCard(modifier: Modifier = Modifier, expense: ExpenseItem, selectedGro
             }
             Spacer(modifier = Modifier.weight(1f))
             Column {
-                Text(
-                    text = expense.amount.toString()+selectedGroup.currency,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorResource(R.color.main_orange)
-                )
+                if (selectedGroup != null) {
+                    Text(
+                        text = expense.amount.toString()+selectedGroup.currency,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorResource(R.color.main_orange)
+                    )
+                }
                 Text(
                     text = expense.date,
                     color = colorResource(R.color.main_orange)
@@ -168,5 +177,4 @@ fun ExpenseCard(modifier: Modifier = Modifier, expense: ExpenseItem, selectedGro
 
         }
     }
-
 }
