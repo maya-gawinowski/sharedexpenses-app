@@ -6,15 +6,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -23,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -34,6 +32,7 @@ import com.example.sharedexpensesapp.datasource.DataSource
 import com.example.sharedexpensesapp.model.items
 import com.example.sharedexpensesapp.ui.screens.AccountScreen
 import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
+import com.example.sharedexpensesapp.ui.screens.BalanceScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
 import com.example.sharedexpensesapp.ui.screens.JoinGroupScreen
 import com.example.sharedexpensesapp.ui.screens.WelcomeScreen
@@ -44,7 +43,8 @@ enum class SharedExpenseScreen(@StringRes val title: Int) {
     Groups(title = R.string.group_page),
     Add(title = R.string.add_page),
     Join(title = R.string.join_page),
-    Account(title = R.string.account_page)
+    Account(title = R.string.account_page),
+    Balance(title = R.string.balance_page)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,12 +110,11 @@ fun SharedExpenseApp() {
         bottomBar = {
             BottomNavigation {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
+                val currentRoute = navBackStackEntry?.destination?.route
                 items.forEach { screen ->
+                    val selected = currentRoute == screen.route
                     BottomNavigationItem(
-                        selected = currentDestination?.hierarchy?.any {
-                            it.route == screen.route
-                        } == true,
+                        selected = selected,
                         onClick = {
                             navController.navigate(screen.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
@@ -125,8 +124,16 @@ fun SharedExpenseApp() {
                                 restoreState = true
                             }
                         },
-                        icon = { Icon(Icons.Filled.Favorite, null) },
-                        label = { Text(text = stringResource(id = screen.resourceId)) })
+                        icon = {
+                            Icon(
+                                painterResource(screen.icon),
+                                null,
+                            )
+                        },
+                        label = { Text(text = screen.label) },
+                        selectedContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                        unselectedContentColor = MaterialTheme.colorScheme.onSurface
+                    )
                 }
             }
         }
@@ -175,6 +182,13 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.Account.name) {
                 AccountScreen()
+            }
+            composable(route = SharedExpenseScreen.Balance.name) {
+                BalanceScreen(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
             }
         }
     }

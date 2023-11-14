@@ -5,4 +5,5 @@
     <string name="join_page">Join group</string>
     <string name="back_button">Back</string>
     <string name="account_page">My Account</string>
+    <string name="balance_page">Balance</string>
 </resources>

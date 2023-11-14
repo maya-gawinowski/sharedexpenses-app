@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.model.GroupItem
 
@@ -116,6 +117,7 @@ fun GroupCard(
     group: GroupItem,
     modifier: Modifier = Modifier,
     onStartOrderButtonClicked: () -> Unit,
+    viewModel: GroupViewModel = viewModel(key = "application")
 ) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -144,7 +146,10 @@ fun GroupCard(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = onStartOrderButtonClicked) {
+            Button(onClick = {
+                viewModel.setSelectedGroup(group)
+                onStartOrderButtonClicked()
+            }) {
                 Text(text = "view")
             }
         }
@@ -163,8 +168,8 @@ fun GroupList(
                 group = group,
                 modifier = modifier.padding(8.dp),
                 onStartOrderButtonClicked = {
-                    GroupViewModel.instance.setSelectedGroup(group)
-                    println(GroupViewModel.instance.selectedGroup.value)
+                    // GroupViewModel.instance.setSelectedGroup(group)
+                    // println(GroupViewModel.instance.selectedGroup.value)
                     onViewButtonClicked()
                 }
             )
