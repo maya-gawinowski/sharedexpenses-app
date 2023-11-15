@@ -1,6 +1,8 @@
 package com.example.sharedexpensesapp.ui.screens
 
+import android.content.ContentValues.TAG
 import android.graphics.fonts.FontStyle
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -55,7 +57,8 @@ fun WelcomScreen(
     onStartOrderButtonClicked: () -> Unit,
     onAddGroupButtonClicked: () -> Unit,
     onJoinGroupButtonClicked: () -> Unit,
-    options: List<GroupItem.GroupI>,
+    onGroupSelected: (GroupItem) -> Unit,
+    options: List<GroupItem>,
     modifier: Modifier = Modifier
 ) {
     var openDialog = remember { mutableStateOf(false) }
@@ -72,7 +75,12 @@ fun WelcomScreen(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        groupList(options = options, onStartOrderButtonClicked = onStartOrderButtonClicked, modifier = Modifier.weight(12f))
+        groupList(
+            options = options,
+            onStartOrderButtonClicked = onStartOrderButtonClicked,
+            onGroupSelected = onGroupSelected,
+            modifier = Modifier.weight(12f)
+        )
         Spacer(modifier = Modifier.weight(1f))
         Row {
             Spacer(modifier = Modifier.weight(1f))
@@ -113,7 +121,12 @@ fun WelcomScreen(
 }
 
 @Composable
-fun groupCard(group: GroupItem, modifier: Modifier = Modifier, onStartOrderButtonClicked: () -> Unit, ) {
+fun groupCard(
+    group: GroupItem,
+    modifier: Modifier = Modifier,
+    onStartOrderButtonClicked: () -> Unit,
+    onGroupSelected: (GroupItem) -> Unit,
+    ) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -141,7 +154,13 @@ fun groupCard(group: GroupItem, modifier: Modifier = Modifier, onStartOrderButto
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = onStartOrderButtonClicked) {
+            Button(
+                onClick = {
+                    onStartOrderButtonClicked()
+                    onGroupSelected(group)
+                    Log.i("GROUP", group.name)
+                }
+            ) {
                 Text(text = "view")
             }
         }
@@ -149,13 +168,19 @@ fun groupCard(group: GroupItem, modifier: Modifier = Modifier, onStartOrderButto
 }
 
 @Composable
-fun groupList(options: List<GroupItem.GroupI>, modifier: Modifier = Modifier, onStartOrderButtonClicked: () -> Unit,) {
+fun groupList(
+    options: List<GroupItem>,
+    modifier: Modifier = Modifier,
+    onStartOrderButtonClicked: () -> Unit,
+    onGroupSelected: (GroupItem) -> Unit,
+) {
     LazyColumn(modifier = modifier) {
         items(options) { option ->
             groupCard(
                 group = option,
                 modifier = modifier.padding(8.dp),
-                onStartOrderButtonClicked = onStartOrderButtonClicked
+                onStartOrderButtonClicked = onStartOrderButtonClicked,
+                onGroupSelected = onGroupSelected
             )
         }
     }
