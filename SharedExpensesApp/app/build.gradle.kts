@@ -63,6 +63,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.navigation:navigation-compose:2.7.0")
     implementation("com.google.firebase:firebase-inappmessaging-ktx:20.4.0")
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
