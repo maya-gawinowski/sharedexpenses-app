@@ -25,6 +25,8 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +44,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.sharedexpensesapp.R
+import com.example.sharedexpensesapp.datasource.GroupsCallback
+import com.example.sharedexpensesapp.datasource.RestClient
+import com.example.sharedexpensesapp.model.Group
 import com.example.sharedexpensesapp.model.GroupItem
 
 
@@ -54,6 +59,20 @@ fun WelcomeScreen(
     modifier: Modifier = Modifier
 ) {
     var isDialogOpen by remember { mutableStateOf(false) }
+    var receivedGroups by remember { mutableStateOf(emptyList<Group>()) }
+    LaunchedEffect(Unit) {
+        RestClient.instance.getGroups(object : GroupsCallback {
+            override fun onSuccess(groups: List<Group>) {
+                receivedGroups= groups
+            }
+
+            override fun onFailure(error: String) {
+                Log.d("RestClient", "GET groups error $error")
+            }
+        })
+    }
+    Log.d("RestClient", "GET groups success $receivedGroups")
+    var openDialog = remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.illustration_sans_titre_35),
