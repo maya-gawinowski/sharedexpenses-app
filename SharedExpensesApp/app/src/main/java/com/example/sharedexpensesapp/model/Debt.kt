@@ -3,7 +3,8 @@ package com.example.sharedexpensesapp.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
-    val name: String,
-    val id: String,
+data class Debt(
+    val debtorId: String,
+    val creditorId: String,
+    val amount: Int
 )

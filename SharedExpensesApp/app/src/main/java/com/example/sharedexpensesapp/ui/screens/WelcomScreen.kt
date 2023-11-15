@@ -1,37 +1,34 @@
 package com.example.sharedexpensesapp.ui.screens
 
-import android.graphics.fonts.FontStyle
+import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -40,13 +37,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.sharedexpensesapp.R
+import com.example.sharedexpensesapp.datasource.GroupsCallback
+import com.example.sharedexpensesapp.datasource.RestClient
+import com.example.sharedexpensesapp.model.Group
 import com.example.sharedexpensesapp.model.GroupItem
 
 
@@ -58,6 +57,19 @@ fun WelcomScreen(
     options: List<GroupItem.GroupI>,
     modifier: Modifier = Modifier
 ) {
+    var receivedGroups by remember { mutableStateOf(emptyList<Group>()) }
+    LaunchedEffect(Unit) {
+        RestClient.instance.getGroups(object : GroupsCallback {
+            override fun onSuccess(groups: List<Group>) {
+                receivedGroups= groups
+            }
+
+            override fun onFailure(error: String) {
+                Log.d("RestClient", "GET groups error $error")
+            }
+        })
+    }
+    Log.d("RestClient", "GET groups success $receivedGroups")
     var openDialog = remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
