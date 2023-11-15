@@ -31,7 +31,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sharedexpensesapp.datasource.DataSource
 import com.example.sharedexpensesapp.model.items
 import com.example.sharedexpensesapp.ui.screens.AccountScreen
-import com.example.sharedexpensesapp.ui.screens.AddExpenseScreen
 import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.BalanceScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
@@ -46,7 +45,6 @@ enum class SharedExpenseScreen(@StringRes val title: Int) {
     Join(title = R.string.join_page),
     Account(title = R.string.account_page),
     Balance(title = R.string.balance_page)
-    AddExpense(title = R.string.add_expense_page)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,16 +143,8 @@ fun SharedExpenseApp() {
             startDestination = SharedExpenseScreen.Start.name,
         ) {
             composable(route = SharedExpenseScreen.Start.name) {
-<<<<<<< HEAD
                 WelcomeScreen(
                     groups = DataSource.groups,
-=======
-                WelcomScreen(
-                    options = DataSource.groups,
-                    onStartOrderButtonClicked = {
-                        navController.navigate(SharedExpenseScreen.Groups.name)
-                    },
->>>>>>> refs/heads/main
                     onAddGroupButtonClicked = {
                         navController.navigate(SharedExpenseScreen.Add.name)
                     },
@@ -171,12 +161,6 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.Groups.name) {
                 GroupScreen(
-<<<<<<< HEAD
-=======
-                    onAddExpenseButtonClicked = {
-                        navController.navigate(SharedExpenseScreen.AddExpense.name)
-                    },
->>>>>>> refs/heads/main
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
@@ -199,13 +183,8 @@ fun SharedExpenseApp() {
             composable(route = SharedExpenseScreen.Account.name) {
                 AccountScreen()
             }
-<<<<<<< HEAD
             composable(route = SharedExpenseScreen.Balance.name) {
                 BalanceScreen(
-=======
-            composable(route = SharedExpenseScreen.AddExpense.name) {
-                AddExpenseScreen(
->>>>>>> refs/heads/main
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding)
