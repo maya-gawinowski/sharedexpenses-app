@@ -10,8 +10,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.Icon
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +39,9 @@ fun AddGroupScreen(modifier: Modifier) {
     var groupDescription by remember { mutableStateOf(TextFieldValue("")) }
     var participantName by remember { mutableStateOf("") }
     var participants by remember { mutableStateOf(listOf("You")) }
+    var currency by remember { mutableStateOf("EUR") }
+    var showCurrencyDropdown by remember { mutableStateOf(false) }
+    val currencyOptions = listOf("EUR", "USD", "DKK")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -88,10 +97,37 @@ fun AddGroupScreen(modifier: Modifier) {
         Spacer(modifier = Modifier.height(8.dp))
 
         // Placeholder for currency selector, which should be replaced with an actual implementation
-        Text(
-            text = "Currency: EUR",
-            modifier = Modifier.align(Alignment.Start)
-        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Currency Dropdown
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Currency: ", fontWeight = FontWeight.Bold)
+            TextButton(onClick = { showCurrencyDropdown = true }) {
+                Text(currency)
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = "Dropdown Arrow"
+                )
+            }
+            DropdownMenu(
+                expanded = showCurrencyDropdown,
+                onDismissRequest = { showCurrencyDropdown = false }
+            ) {
+                currencyOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            currency = option
+                            showCurrencyDropdown = false
+                        }
+                    )
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
