@@ -1,6 +1,3 @@
 package com.example.sharedexpensesapp.model
 
-data class User(
-    val name: String,
-    val id: String,
-)
+data class User(val id: String, val name: String, val groupId: String)

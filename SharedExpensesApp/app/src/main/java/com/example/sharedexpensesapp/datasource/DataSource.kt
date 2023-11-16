@@ -1,8 +1,22 @@
 package com.example.sharedexpensesapp.datasource
 
+import com.example.sharedexpensesapp.model.Debt
 import com.example.sharedexpensesapp.model.ExpenseItem
 import com.example.sharedexpensesapp.model.GroupItem
 import com.example.sharedexpensesapp.model.User
+
+val names = listOf(
+    "Elena",
+    "Marcus",
+    "Sophie",
+    "Javier",
+    "Aria",
+    "Nolan",
+    "Layla",
+    "Caleb",
+    "Zara",
+    "Mateo"
+)
 
 object DataSource {
     val groups = listOf(
@@ -11,9 +25,9 @@ object DataSource {
             description = "Description 1",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -78,9 +92,9 @@ object DataSource {
             description = "Description 2",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -110,9 +124,9 @@ object DataSource {
             description = "Description 3",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -142,9 +156,9 @@ object DataSource {
             description = "Description 3",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -167,14 +181,15 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem(
+        ),
+        GroupItem(
             name = "Group Eiffel",
             description = "Description 3",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -197,14 +212,15 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem(
+        ),
+        GroupItem(
             name = "Group MontPellier",
             description = "Description 3",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -227,14 +243,15 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem(
+        ),
+        GroupItem(
             name = "Group Toulouse",
             description = "Description 3",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -257,14 +274,15 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem(
+        ),
+        GroupItem(
             name = "Group Paris",
             description = "Description 3",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -287,14 +305,15 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem(
+        ),
+        GroupItem(
             name = "Group Coloc",
             description = "Description 3",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -317,14 +336,15 @@ object DataSource {
                 ),
             ),
             currency = "€"
-        ),GroupItem(
+        ),
+        GroupItem(
             name = "Group sous",
             description = "Description 3",
             balance = 123.4,
             participants = listOf(
-                Pair("User 1", 3.14),
-                Pair("User 2", 2.5),
-                Pair("User 3", 1.0)
+                "User 1",
+                "User 2",
+                "User 3",
             ),
             expenses = listOf(
                 ExpenseItem(
@@ -349,34 +369,28 @@ object DataSource {
             currency = "€"
         ),
     )
-    val users = listOf(
-        User(
-            name = "Mitsch",
-            id = "1",
-        ),
-        User(
-            name = "Maya",
-            id = "2",
-        ),
-        User(
-            name = "Manca",
-            id = "3",
-        ),
-        User(
-            name = "Kiran",
-            id = "4",
-        ),
-        User(
-            name = "Marcin",
-            id = "5",
-        ),
-        User(
-            name = "Luca",
-            id = "6",
-        ),
-        User(
-            name = "Eckelman",
-            id = "7",
-        ),
-    )
+    private var counter = 0
+    val users = names.map { name -> User("User ${counter++}", name, groups.random().name) }
+
+    fun getDebts(group: GroupItem?): List<Debt> {
+        val userBalances = mutableMapOf<String, Double>()
+
+        group?.expenses?.forEach { expense ->
+            val amountPerUser = expense.amount / group.participants.size
+            group.participants.forEach { participant ->
+                if (participant != expense.participant) {
+                    val creditorId = expense.participant
+
+                    val debtKey = "$participant-$creditorId"
+
+                    userBalances[debtKey] = (userBalances[debtKey] ?: 0.0) + amountPerUser
+                }
+            }
+        }
+
+        return userBalances.map { (debtKey, amount) ->
+            val (debtorId, creditorId) = debtKey.split("-")
+            Debt(debtorId, creditorId, amount)
+        }
+    }
 }

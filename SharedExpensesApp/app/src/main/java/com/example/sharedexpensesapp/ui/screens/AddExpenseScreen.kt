@@ -1,5 +1,7 @@
 package com.example.sharedexpensesapp.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +57,7 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AddExpenseScreen(
     modifier: Modifier = Modifier,
@@ -63,7 +66,6 @@ fun AddExpenseScreen(
     val users = DataSource.users
     var description by remember { mutableStateOf("") }
     var amountInput by remember { mutableStateOf("") }
-    // date picker
     var pickedDate by remember { mutableStateOf(LocalDate.now()) }
     val formattedDate by remember {
         derivedStateOf {
@@ -72,11 +74,9 @@ fun AddExpenseScreen(
         }
     }
     val dateDialogState = rememberMaterialDialogState()
-    // dropdown menu
     val dropDownMenuStateHolder = remember {
         DropDownMenuStateHolder(users.map { user -> user.name })
     }
-    // lazy list
     var participants by remember {
         mutableStateOf(
             users.map {
@@ -130,11 +130,11 @@ fun AddExpenseScreen(
         Spacer(Modifier.size(16.dp))
         PayerDropDownMenu(dropDownMenuStateHolder)
         Spacer(Modifier.size(16.dp))
-        Row (
+        Row(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 .fillMaxWidth(0.75f)
-        ){
+        ) {
             Text(
                 text = "Split among:",
                 fontWeight = FontWeight.Bold,
@@ -147,7 +147,7 @@ fun AddExpenseScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             items(participants.size) { i ->
-                ElevatedCard (
+                ElevatedCard(
                     elevation = CardDefaults.cardElevation(
                         defaultElevation = 6.dp
                     ),
@@ -250,7 +250,7 @@ private fun PayerDropDownMenu(dropDownMenuStateHolder: DropDownMenuStateHolder) 
     }
 }
 
-data class UserListItem (
+data class UserListItem(
     val title: String,
     val id: String,
     val isSelected: Boolean,

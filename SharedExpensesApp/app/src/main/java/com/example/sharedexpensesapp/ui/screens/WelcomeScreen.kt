@@ -1,39 +1,33 @@
 package com.example.sharedexpensesapp.ui.screens
 
-import android.content.ContentValues.TAG
-import android.graphics.fonts.FontStyle
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -42,7 +36,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -53,15 +46,14 @@ import com.example.sharedexpensesapp.model.GroupItem
 
 
 @Composable
-fun WelcomScreen(
-    onStartOrderButtonClicked: () -> Unit,
+fun WelcomeScreen(
     onAddGroupButtonClicked: () -> Unit,
     onJoinGroupButtonClicked: () -> Unit,
     onGroupSelected: (GroupItem) -> Unit,
-    options: List<GroupItem>,
+    groups: List<GroupItem>,
     modifier: Modifier = Modifier
 ) {
-    var openDialog = remember { mutableStateOf(false) }
+    var isDialogOpen by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.illustration_sans_titre_35),
@@ -75,9 +67,9 @@ fun WelcomScreen(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        groupList(
-            options = options,
-            onStartOrderButtonClicked = onStartOrderButtonClicked,
+        GroupList(
+            groups = groups,
+            onStartOrderButtonClicked = onGroupSelected,
             onGroupSelected = onGroupSelected,
             modifier = Modifier.weight(12f)
         )
@@ -85,10 +77,11 @@ fun WelcomScreen(
         Row {
             Spacer(modifier = Modifier.weight(1f))
             Button(
-                onClick = { openDialog.value = true },
+                onClick = { isDialogOpen = true },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.main_orange),
-                    contentColor = Color.White),
+                    contentColor = Color.White
+                ),
                 modifier = Modifier
                     .padding(10.dp)
 
@@ -103,11 +96,11 @@ fun WelcomScreen(
         }
     }
     when {
-        openDialog.value -> {
-            choiceDialog(
-                onDismissRequest = { openDialog.value = false },
+        isDialogOpen -> {
+            ChoiceDialog(
+                onDismissRequest = { isDialogOpen = false },
                 onConfirmation = {
-                    openDialog.value = false
+                    isDialogOpen = false
                     println("Confirmation registered") // Add logic here to handle confirmation.
                 },
                 dialogTitle = "Alert dialog example",
@@ -121,12 +114,12 @@ fun WelcomScreen(
 }
 
 @Composable
-fun groupCard(
+fun GroupCard(
     group: GroupItem,
     modifier: Modifier = Modifier,
-    onStartOrderButtonClicked: () -> Unit,
+    onStartOrderButtonClicked: (group: GroupItem) -> Unit,
     onGroupSelected: (GroupItem) -> Unit,
-    ) {
+) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -156,7 +149,7 @@ fun groupCard(
             Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = {
-                    onStartOrderButtonClicked()
+                    onStartOrderButtonClicked(group)
                     onGroupSelected(group)
                     Log.i("GROUP", group.name)
                 }
@@ -168,16 +161,16 @@ fun groupCard(
 }
 
 @Composable
-fun groupList(
-    options: List<GroupItem>,
+fun GroupList(
+    groups: List<GroupItem>,
     modifier: Modifier = Modifier,
-    onStartOrderButtonClicked: () -> Unit,
+    onStartOrderButtonClicked: (groupItem: GroupItem) -> Unit,
     onGroupSelected: (GroupItem) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
-        items(options) { option ->
-            groupCard(
-                group = option,
+        items(groups) { group ->
+            GroupCard(
+                group = group,
                 modifier = modifier.padding(8.dp),
                 onStartOrderButtonClicked = onStartOrderButtonClicked,
                 onGroupSelected = onGroupSelected
@@ -187,7 +180,7 @@ fun groupList(
 }
 
 @Composable
-fun choiceDialog(
+fun ChoiceDialog(
     onDismissRequest: () -> Unit,
     onConfirmation: () -> Unit,
     onAddGroupButtonClicked: () -> Unit,
@@ -227,7 +220,8 @@ fun choiceDialog(
                     onClick = onAddGroupButtonClicked,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(R.color.button_purple),
-                        contentColor = colorResource(R.color.main_purple)),
+                        contentColor = colorResource(R.color.main_purple)
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp)
@@ -238,7 +232,8 @@ fun choiceDialog(
                     onClick = onJoinGroupButtonClicked,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(R.color.button_purple),
-                        contentColor = colorResource(R.color.main_purple)),
+                        contentColor = colorResource(R.color.main_purple)
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp)
