@@ -1,8 +1,11 @@
 package com.example.sharedexpensesapp.ui.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,49 +15,43 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.datasource.DataSource
-import com.example.sharedexpensesapp.model.Expense
+import com.example.sharedexpensesapp.model.Debt
 import com.example.sharedexpensesapp.model.GroupItem
-import com.example.sharedexpensesapp.ui.screens.composables.Dropdown
 
 @Composable
 fun BalanceScreen(
     modifier: Modifier = Modifier,
-    viewModel: GroupViewModel = viewModel(key = "application")
+    group: GroupItem?
 ) {
-    val groups by viewModel.groups.collectAsState()
-    val selectedGroup by viewModel.selectedGroup.collectAsState()
-    val expensesOfGroup = DataSource.expenses.filter { expense ->
-        expense.groupId == selectedGroup.name
-    }
+    val debts = DataSource.getDebts(group)
 
-    Column(modifier = modifier) {
-        Dropdown(
-            selectedItem = selectedGroup.name,
-            items = groups.map { group -> group.name },
-            onValueChange = { viewModel.setSelectedGroup(it) },
-            onItemSelected = { viewModel.setSelectedGroup(it) }
+    Box(modifier = modifier) {
+        Image(
+            painter = painterResource(id = R.drawable.illustration_sans_titre_35),
+            contentDescription = "Hintergrundbild",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.matchParentSize()
         )
+    }
+    Column(modifier = modifier) {
         LazyColumn {
-            items(expensesOfGroup) { expense ->
-                ExpenseCard(expense = expense)
-            }
+            items(debts) { debt -> DebtCard(debt = debt, group = group) }
         }
-
     }
 }
 
 @Composable
-fun ExpenseCard(expense: Expense) {
+fun DebtCard(debt: Debt, group: GroupItem?) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -69,26 +66,30 @@ fun ExpenseCard(expense: Expense) {
         Column(modifier = Modifier.padding(5.dp)) {
             Row {
                 Text(
-                    text = expense.description,
+                    text = debt.debtorId,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.main_purple),
-                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = 20.sp
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                Text("CHF ${expense.amount}.-")
+                Text(
+                    "${debt.amount} ${group?.currency}",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.main_orange)
+                )
             }
-            val namesOfUsers =
-                DataSource.users.filter { user -> expense.participantsId.contains(user.id) }
-                    .map { user -> user.name }
-                    .joinToString(", ")
             Text(
-                text = namesOfUsers,
-                style = MaterialTheme.typography.titleSmall,
+                text = "owes to",
+                color = colorResource(R.color.main_purple),
+                fontSize = 13.sp
             )
-            val oweText = if (expense.participantsId.size > 1) "owe to" else "owes to"
-            Text(text = oweText, style = MaterialTheme.typography.labelSmall)
-            val payerName = DataSource.users.find { user -> user.id == expense.payerId }?.name ?: ""
-            Text(text = payerName, style = MaterialTheme.typography.titleSmall)
+            Text(
+                text = debt.creditorId,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.main_purple),
+                fontSize = 20.sp
+            )
         }
     }
 }
@@ -96,28 +97,6 @@ fun ExpenseCard(expense: Expense) {
 @Preview
 @Composable
 fun BalancePreview() {
-    val viewModel: GroupViewModel = viewModel()
-    val groups by viewModel.groups.collectAsState()
-    var selectedGroup = groups[0]
-    var biggestNumberOfExpenses = 0
-
-    groups.forEach { group ->
-        val expenses = DataSource.expenses.filter { expense -> expense.groupId == group.name }
-        val numberOfExpenses = expenses.size
-        if (numberOfExpenses > biggestNumberOfExpenses) {
-            biggestNumberOfExpenses = numberOfExpenses
-            selectedGroup = group
-        }
-    }
-
-    Column {
-        Dropdown(
-            selectedItem = selectedGroup.name,
-            items = groups.map { group -> group.name },
-            onValueChange = { viewModel.setSelectedGroup(it) },
-            onItemSelected = { viewModel.setSelectedGroup(it) }
-        )
-        DataSource.expenses.filter { expense -> expense.groupId == selectedGroup.name }
-            .map { expense -> ExpenseCard(expense = expense) }
-    }
+    BalanceScreen(group = DataSource.groups[0], modifier = Modifier.fillMaxSize())
 }
+

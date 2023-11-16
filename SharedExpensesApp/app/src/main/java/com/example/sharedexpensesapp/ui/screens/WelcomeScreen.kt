@@ -1,7 +1,5 @@
 package com.example.sharedexpensesapp.ui.screens
 
-import android.content.ContentValues.TAG
-import android.graphics.fonts.FontStyle
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -43,7 +41,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.model.GroupItem
 
@@ -53,7 +50,7 @@ fun WelcomeScreen(
     onAddGroupButtonClicked: () -> Unit,
     onJoinGroupButtonClicked: () -> Unit,
     onGroupSelected: (GroupItem) -> Unit,
-    options: List<GroupItem>,
+    groups: List<GroupItem>,
     modifier: Modifier = Modifier
 ) {
     var isDialogOpen by remember { mutableStateOf(false) }
@@ -70,9 +67,9 @@ fun WelcomeScreen(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        groupList(
-            options = options,
-            onStartOrderButtonClicked = onStartOrderButtonClicked,
+        GroupList(
+            groups = groups,
+            onStartOrderButtonClicked = onGroupSelected,
             onGroupSelected = onGroupSelected,
             modifier = Modifier.weight(12f)
         )
@@ -117,12 +114,12 @@ fun WelcomeScreen(
 }
 
 @Composable
-fun groupCard(
+fun GroupCard(
     group: GroupItem,
     modifier: Modifier = Modifier,
-    onStartOrderButtonClicked: () -> Unit,
+    onStartOrderButtonClicked: (group: GroupItem) -> Unit,
     onGroupSelected: (GroupItem) -> Unit,
-    ) {
+) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -152,7 +149,7 @@ fun groupCard(
             Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = {
-                    onStartOrderButtonClicked()
+                    onStartOrderButtonClicked(group)
                     onGroupSelected(group)
                     Log.i("GROUP", group.name)
                 }
@@ -164,10 +161,10 @@ fun groupCard(
 }
 
 @Composable
-fun groupList(
-    options: List<GroupItem>,
+fun GroupList(
+    groups: List<GroupItem>,
     modifier: Modifier = Modifier,
-    onStartOrderButtonClicked: () -> Unit,
+    onStartOrderButtonClicked: (groupItem: GroupItem) -> Unit,
     onGroupSelected: (GroupItem) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {

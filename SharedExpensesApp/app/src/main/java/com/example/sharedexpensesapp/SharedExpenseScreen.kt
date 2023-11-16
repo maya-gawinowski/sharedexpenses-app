@@ -1,6 +1,5 @@
 package com.example.sharedexpensesapp
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,7 +17,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,22 +25,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-<<<<<<< HEAD
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-=======
-import androidx.lifecycle.viewmodel.compose.viewModel
->>>>>>> refs/heads/main
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.sharedexpensesapp.datasource.DataSource
-<<<<<<< HEAD
-import com.example.sharedexpensesapp.model.items
-=======
 import com.example.sharedexpensesapp.model.GroupItem
->>>>>>> refs/heads/main
+import com.example.sharedexpensesapp.model.screens
 import com.example.sharedexpensesapp.ui.screens.AccountScreen
 import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.BalanceScreen
@@ -57,7 +49,8 @@ enum class SharedExpenseScreen(@StringRes val title: Int) {
     AddGroup(title = R.string.add_page),
     Join(title = R.string.join_page),
     Account(title = R.string.account_page),
-    Balance(title = R.string.balance_page)
+    Balance(title = R.string.balance_page),
+    AddExpense(title = R.string.add_expense_page)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +61,6 @@ fun SharedExpenseBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit = {},
     navAccount: NavHostController,
-    modifier: Modifier = Modifier,
     selectedGroup: GroupItem?,
 ) {
     TopAppBar(
@@ -112,11 +104,9 @@ fun SharedExpenseBar(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SharedExpenseApp() {
     val navController = rememberNavController()
-    val viewModel: GroupViewModel = viewModel()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = SharedExpenseScreen.valueOf(
         backStackEntry?.destination?.route ?: SharedExpenseScreen.Start.name
@@ -134,41 +124,18 @@ fun SharedExpenseApp() {
             )
         },
         bottomBar = {
-            BottomNavigation {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
-                items.forEach { screen ->
-                    val selected = currentRoute == screen.route
-                    BottomNavigationItem(
-                        selected = selected,
-                        onClick = {
-                            navController.navigate(screen.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                painterResource(screen.icon),
-                                null,
-                            )
-                        },
-                        label = { Text(text = screen.label) },
-                        selectedContentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                        unselectedContentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+            if (currentScreen.name != SharedExpenseScreen.Start.name) {
+                BottomTabs(navController = navController, currentRoute = currentScreen.name)
             }
         }
-    ) {innerPadding ->
-        val uiState by viewModel.uiState.collectAsState()
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = SharedExpenseScreen.Start.name,
         ) {
+            val baseModifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
             composable(route = SharedExpenseScreen.Start.name) {
                 WelcomeScreen(
                     groups = DataSource.groups,
@@ -180,13 +147,9 @@ fun SharedExpenseApp() {
                     },
                     onGroupSelected = { group ->
                         selectedGroup = group
-                    },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    onViewButtonClicked = {
                         navController.navigate(SharedExpenseScreen.Groups.name)
                     },
+                    modifier = baseModifier,
                 )
             }
             composable(route = SharedExpenseScreen.Groups.name) {
@@ -195,35 +158,55 @@ fun SharedExpenseApp() {
                     onAddExpenseButtonClicked = {
                         navController.navigate(SharedExpenseScreen.AddExpense.name)
                     },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
+                    modifier = baseModifier,
                 )
             }
             composable(route = SharedExpenseScreen.AddGroup.name) {
                 AddGroupScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
+                    modifier = baseModifier
                 )
             }
             composable(route = SharedExpenseScreen.Join.name) {
                 JoinGroupScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
+                    modifier = baseModifier
                 )
             }
             composable(route = SharedExpenseScreen.Account.name) {
                 AccountScreen()
             }
             composable(route = SharedExpenseScreen.Balance.name) {
-                BalanceScreen(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                )
+                BalanceScreen(group = selectedGroup, modifier = baseModifier)
             }
+        }
+    }
+}
+
+@Composable
+fun BottomTabs(navController: NavController, currentRoute: String) {
+    BottomNavigation {
+        screens.forEach { screen ->
+            val selected = currentRoute == screen.route
+            BottomNavigationItem(
+                selected = selected,
+                onClick = {
+                    navController.navigate(screen.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                icon = {
+                    Icon(
+                        painterResource(screen.icon),
+                        null,
+                    )
+                },
+                label = { Text(text = screen.label) },
+                selectedContentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }

@@ -1,9 +1,7 @@
 package com.example.sharedexpensesapp.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,20 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -36,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.model.ExpenseItem
 import com.example.sharedexpensesapp.model.GroupItem
-import com.example.sharedexpensesapp.model.GroupUIState
 
 @Composable
 fun GroupScreen(
@@ -71,7 +62,8 @@ fun GroupScreen(
                 onClick = onAddExpenseButtonClicked,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.main_orange),
-                    contentColor = Color.White),
+                    contentColor = Color.White
+                ),
                 modifier = Modifier
                     .padding(10.dp)
 
@@ -156,7 +148,7 @@ fun ExpenseCard(modifier: Modifier = Modifier, expense: ExpenseItem, selectedGro
                     color = colorResource(R.color.main_purple)
                 )
                 Text(
-                    text = "Payed by "+expense.participant,
+                    text = "Payed by " + expense.participant,
                     color = colorResource(R.color.main_purple)
                 )
             }
@@ -164,7 +156,7 @@ fun ExpenseCard(modifier: Modifier = Modifier, expense: ExpenseItem, selectedGro
             Column {
                 if (selectedGroup != null) {
                     Text(
-                        text = expense.amount.toString()+selectedGroup.currency,
+                        text = expense.amount.toString() + selectedGroup.currency,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = colorResource(R.color.main_orange)

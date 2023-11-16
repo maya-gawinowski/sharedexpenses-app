@@ -70,4 +70,5 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
 }

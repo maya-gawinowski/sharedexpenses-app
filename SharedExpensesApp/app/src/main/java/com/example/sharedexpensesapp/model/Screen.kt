@@ -10,9 +10,9 @@ sealed class Screen(
     val icon: Int,
     val label: String
 ) {
-    object Spendings :
+    object Groups :
         Screen(
-            SharedExpenseScreen.Start.name,
+            SharedExpenseScreen.Groups.name,
             R.string.account_page,
             R.drawable.baseline_shopping_cart_24,
             "Spendings"
@@ -30,8 +30,8 @@ sealed class Screen(
         Screen("settings", R.string.app_name, R.drawable.baseline_settings_24, "Settings")
 }
 
-val items = listOf(
-    Screen.Spendings,
+val screens = listOf(
+    Screen.Groups,
     Screen.Balance,
     Screen.Settings
 )

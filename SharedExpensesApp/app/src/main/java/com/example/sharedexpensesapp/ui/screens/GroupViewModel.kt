@@ -1,9 +1,9 @@
 package com.example.sharedexpensesapp.ui.screens
 
 import androidx.lifecycle.ViewModel
+import com.example.sharedexpensesapp.model.GroupUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import com.example.sharedexpensesapp.model.GroupUIState
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -18,7 +18,7 @@ class GroupViewModel : ViewModel() {
     }
 
     private fun updateItem(group: Int, previousGroup: Int?) {
-        _uiState.update {currentState ->
+        _uiState.update { currentState ->
             currentState.copy(
                 groupNumber = group
             )
