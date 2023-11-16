@@ -1,34 +1,27 @@
 package com.example.sharedexpensesapp.ui.screens
 
 import androidx.lifecycle.ViewModel
-import com.example.sharedexpensesapp.datasource.DataSource
-import com.example.sharedexpensesapp.model.GroupItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import com.example.sharedexpensesapp.model.GroupUIState
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 class GroupViewModel : ViewModel() {
-    private val _groups: MutableStateFlow<List<GroupItem>> = MutableStateFlow(DataSource.groups)
-    private val _selectedGroup: MutableStateFlow<GroupItem> =
-        MutableStateFlow(GroupItem("No group selected", ""))
-    val groups: StateFlow<List<GroupItem>> get() = _groups
-    val selectedGroup: StateFlow<GroupItem> get() = _selectedGroup
 
+    private val _uiState = MutableStateFlow(GroupUIState())
+    val uiState: StateFlow<GroupUIState> = _uiState.asStateFlow()
 
-    fun setGroups(groups: List<GroupItem>) {
-        _groups.value = groups
+    fun updateGroupSelection(group: Int) {
+        val previousGroupSelected = _uiState.value.groupNumber
+        updateItem(group, previousGroupSelected)
     }
 
-    fun setSelectedGroup(group: GroupItem) {
-        _selectedGroup.value = group
+    private fun updateItem(group: Int, previousGroup: Int?) {
+        _uiState.update {currentState ->
+            currentState.copy(
+                groupNumber = group
+            )
+        }
     }
-
-    fun setSelectedGroup(groupName: String) {
-        _selectedGroup.value = getByName(groupName)
-    }
-
-    fun getByName(name: String) =
-        _groups.value.find { groupItem -> groupItem.name == name } ?: GroupItem(
-            "Group not found",
-            ""
-        )
 }

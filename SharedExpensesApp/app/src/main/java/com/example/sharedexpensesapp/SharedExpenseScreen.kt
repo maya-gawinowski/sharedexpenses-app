@@ -1,5 +1,6 @@
 package com.example.sharedexpensesapp
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,19 +18,31 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+<<<<<<< HEAD
 import androidx.navigation.NavGraph.Companion.findStartDestination
+=======
+import androidx.lifecycle.viewmodel.compose.viewModel
+>>>>>>> refs/heads/main
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.sharedexpensesapp.datasource.DataSource
+<<<<<<< HEAD
 import com.example.sharedexpensesapp.model.items
+=======
+import com.example.sharedexpensesapp.model.GroupItem
+>>>>>>> refs/heads/main
 import com.example.sharedexpensesapp.ui.screens.AccountScreen
 import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.BalanceScreen
@@ -41,7 +54,7 @@ import com.example.sharedexpensesapp.ui.screens.WelcomeScreen
 enum class SharedExpenseScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
     Groups(title = R.string.group_page),
-    Add(title = R.string.add_page),
+    AddGroup(title = R.string.add_page),
     Join(title = R.string.join_page),
     Account(title = R.string.account_page),
     Balance(title = R.string.balance_page)
@@ -55,9 +68,18 @@ fun SharedExpenseBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit = {},
     navAccount: NavHostController,
+    modifier: Modifier = Modifier,
+    selectedGroup: GroupItem?,
 ) {
     TopAppBar(
-        title = { Text(stringResource(currentScreen.title)) },
+        title = {
+            if (currentScreen == SharedExpenseScreen.Groups) {
+                Text(selectedGroup?.name.toString())
+
+            } else {
+                Text(stringResource(currentScreen.title))
+            }
+        },
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
@@ -94,10 +116,13 @@ fun SharedExpenseBar(
 @Composable
 fun SharedExpenseApp() {
     val navController = rememberNavController()
+    val viewModel: GroupViewModel = viewModel()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = SharedExpenseScreen.valueOf(
         backStackEntry?.destination?.route ?: SharedExpenseScreen.Start.name
     )
+    var selectedGroup by remember { mutableStateOf<GroupItem?>(null) }
+
     Scaffold(
         topBar = {
             SharedExpenseBar(
@@ -105,6 +130,7 @@ fun SharedExpenseApp() {
                 canNavigateBack = navController.previousBackStackEntry != null,
                 navigateUp = { navController.navigateUp() },
                 navAccount = navController,
+                selectedGroup = selectedGroup,
             )
         },
         bottomBar = {
@@ -137,7 +163,8 @@ fun SharedExpenseApp() {
                 }
             }
         }
-    ) { innerPadding ->
+    ) {innerPadding ->
+        val uiState by viewModel.uiState.collectAsState()
         NavHost(
             navController = navController,
             startDestination = SharedExpenseScreen.Start.name,
@@ -146,10 +173,13 @@ fun SharedExpenseApp() {
                 WelcomeScreen(
                     groups = DataSource.groups,
                     onAddGroupButtonClicked = {
-                        navController.navigate(SharedExpenseScreen.Add.name)
+                        navController.navigate(SharedExpenseScreen.AddGroup.name)
                     },
                     onJoinGroupButtonClicked = {
                         navController.navigate(SharedExpenseScreen.Join.name)
+                    },
+                    onGroupSelected = { group ->
+                        selectedGroup = group
                     },
                     modifier = Modifier
                         .fillMaxSize()
@@ -161,12 +191,16 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.Groups.name) {
                 GroupScreen(
+                    selectedGroup = selectedGroup,
+                    onAddExpenseButtonClicked = {
+                        navController.navigate(SharedExpenseScreen.AddExpense.name)
+                    },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
                 )
             }
-            composable(route = SharedExpenseScreen.Add.name) {
+            composable(route = SharedExpenseScreen.AddGroup.name) {
                 AddGroupScreen(
                     modifier = Modifier
                         .fillMaxSize()

@@ -1,5 +1,8 @@
 package com.example.sharedexpensesapp.ui.screens
 
+import android.content.ContentValues.TAG
+import android.graphics.fonts.FontStyle
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,9 +52,9 @@ import com.example.sharedexpensesapp.model.GroupItem
 fun WelcomeScreen(
     onAddGroupButtonClicked: () -> Unit,
     onJoinGroupButtonClicked: () -> Unit,
-    onViewButtonClicked: () -> Unit,
-    groups: List<GroupItem>,
-    modifier: Modifier = Modifier,
+    onGroupSelected: (GroupItem) -> Unit,
+    options: List<GroupItem>,
+    modifier: Modifier = Modifier
 ) {
     var isDialogOpen by remember { mutableStateOf(false) }
     Box(modifier = Modifier.fillMaxSize()) {
@@ -67,10 +70,11 @@ fun WelcomeScreen(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        GroupList(
-            groups = groups,
-            modifier = Modifier.weight(12f),
-            onViewButtonClicked = onViewButtonClicked,
+        groupList(
+            options = options,
+            onStartOrderButtonClicked = onStartOrderButtonClicked,
+            onGroupSelected = onGroupSelected,
+            modifier = Modifier.weight(12f)
         )
         Spacer(modifier = Modifier.weight(1f))
         Row {
@@ -113,12 +117,12 @@ fun WelcomeScreen(
 }
 
 @Composable
-fun GroupCard(
+fun groupCard(
     group: GroupItem,
     modifier: Modifier = Modifier,
     onStartOrderButtonClicked: () -> Unit,
-    viewModel: GroupViewModel = viewModel(key = "application")
-) {
+    onGroupSelected: (GroupItem) -> Unit,
+    ) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -146,10 +150,13 @@ fun GroupCard(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = {
-                viewModel.setSelectedGroup(group)
-                onStartOrderButtonClicked()
-            }) {
+            Button(
+                onClick = {
+                    onStartOrderButtonClicked()
+                    onGroupSelected(group)
+                    Log.i("GROUP", group.name)
+                }
+            ) {
                 Text(text = "view")
             }
         }
@@ -157,21 +164,19 @@ fun GroupCard(
 }
 
 @Composable
-fun GroupList(
-    groups: List<GroupItem>,
+fun groupList(
+    options: List<GroupItem>,
     modifier: Modifier = Modifier,
-    onViewButtonClicked: () -> Unit,
+    onStartOrderButtonClicked: () -> Unit,
+    onGroupSelected: (GroupItem) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         items(groups) { group ->
             GroupCard(
                 group = group,
                 modifier = modifier.padding(8.dp),
-                onStartOrderButtonClicked = {
-                    // GroupViewModel.instance.setSelectedGroup(group)
-                    // println(GroupViewModel.instance.selectedGroup.value)
-                    onViewButtonClicked()
-                }
+                onStartOrderButtonClicked = onStartOrderButtonClicked,
+                onGroupSelected = onGroupSelected
             )
         }
     }
