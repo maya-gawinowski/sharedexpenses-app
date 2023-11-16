@@ -41,6 +41,7 @@ import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.BalanceScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
 import com.example.sharedexpensesapp.ui.screens.JoinGroupScreen
+import com.example.sharedexpensesapp.ui.screens.SettingsScreen
 import com.example.sharedexpensesapp.ui.screens.WelcomeScreen
 
 
@@ -51,7 +52,8 @@ enum class SharedExpenseScreen(@StringRes val title: Int) {
     Join(title = R.string.join_page),
     Account(title = R.string.account_page),
     Balance(title = R.string.balance_page),
-    AddExpense(title = R.string.add_expense_page)
+    AddExpense(title = R.string.add_expense_page),
+    Settings(title = R.string.settings)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -182,6 +184,9 @@ fun SharedExpenseApp() {
                 AddExpenseScreen(
                     modifier = baseModifier,
                 )
+            }
+            composable(route = SharedExpenseScreen.Settings.name) {
+                SettingsScreen(modifier = baseModifier)
             }
         }
     }

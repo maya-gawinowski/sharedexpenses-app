@@ -7,4 +7,5 @@
     <string name="account_page">My Account</string>
     <string name="balance_page">Balance</string>
     <string name="add_expense_page">Add expense</string>
+    <string name="settings">Settings</string>
 </resources>
