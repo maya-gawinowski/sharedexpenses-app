@@ -36,6 +36,7 @@ import com.example.sharedexpensesapp.datasource.DataSource
 import com.example.sharedexpensesapp.model.GroupItem
 import com.example.sharedexpensesapp.model.screens
 import com.example.sharedexpensesapp.ui.screens.AccountScreen
+import com.example.sharedexpensesapp.ui.screens.AddExpenseScreen
 import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.BalanceScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
@@ -176,6 +177,11 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.Balance.name) {
                 BalanceScreen(group = selectedGroup, modifier = baseModifier)
+            }
+            composable(route = SharedExpenseScreen.AddExpense.name) {
+                AddExpenseScreen(
+                    modifier = baseModifier,
+                )
             }
         }
     }
