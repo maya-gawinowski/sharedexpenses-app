@@ -116,3 +116,12 @@ app.delete('/groups/:groupId', (req: Request, res: Response) => {
   groups = groups.filter((item) => item != group);
   res.status(200).send('Sucessfully deleted');
 });
+
+app.get('/groups/:groupId/users', (req: Request, res: Response) => {
+  const groupId = req.params.groupId;
+  const group = groups.find((g) => g.getId() === groupId);
+  if (!group) {
+    res.status(404).send('Group not found');
+  }
+  res.json(group.getUsers());
+});

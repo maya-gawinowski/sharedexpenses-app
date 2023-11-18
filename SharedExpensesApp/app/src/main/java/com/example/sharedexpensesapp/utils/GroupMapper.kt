@@ -10,6 +10,7 @@ class GroupMapper {
     companion object {
         fun mapToGroupItem(group: Group): GroupItem {
             return GroupItem(
+                id = group.id,
                 name = group.name,
                 description = group.description,
                 balance = group.balance,
@@ -19,7 +20,7 @@ class GroupMapper {
             )
         }
 
-        private fun mapToExpenseItem(expense: Expense): ExpenseItem {
+        fun mapToExpenseItem(expense: Expense): ExpenseItem {
             return ExpenseItem(
                 participant = expense.payerId,
                 amount = expense.amount,

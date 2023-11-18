@@ -56,6 +56,20 @@ export class Datasource {
       date: new Date(),
       description: "Tickets to the museum"
     })
+    choufleur.addExpense({
+      payerId: "1",
+      participantsIds: choufleur.getUsers().map(user => user.getId()),
+      amount: 120.0,
+      date: new Date(),
+      description: "For wine"
+    })
+    choufleur.addExpense({
+      payerId: "2",
+      participantsIds: choufleur.getUsers().map(user => user.getId()),
+      amount: 230.0,
+      date: new Date(),
+      description: "Train tickets"
+    })
 
   }
 

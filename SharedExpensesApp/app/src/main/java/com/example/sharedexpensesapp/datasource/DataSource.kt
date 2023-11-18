@@ -21,6 +21,7 @@ val names = listOf(
 object DataSource {
     val groups = listOf(
         GroupItem(
+            id = "1",
             name = "Group Choufleur",
             description = "Description 1",
             balance = 123.4,
@@ -88,6 +89,7 @@ object DataSource {
             currency = "€"
         ),
         GroupItem(
+            id = "2",
             name = "Group Carotte",
             description = "Description 2",
             balance = 123.4,
@@ -120,6 +122,7 @@ object DataSource {
 
         ),
         GroupItem(
+            id = "3",
             name = "Group Meringue",
             description = "Description 3",
             balance = 123.4,
@@ -152,6 +155,7 @@ object DataSource {
 
         ),
         GroupItem(
+            id = "4",
             name = "Group Souflé",
             description = "Description 3",
             balance = 123.4,
@@ -183,6 +187,7 @@ object DataSource {
             currency = "€"
         ),
         GroupItem(
+            id = "5",
             name = "Group Eiffel",
             description = "Description 3",
             balance = 123.4,
@@ -214,6 +219,7 @@ object DataSource {
             currency = "€"
         ),
         GroupItem(
+            id = "6",
             name = "Group MontPellier",
             description = "Description 3",
             balance = 123.4,
@@ -245,6 +251,7 @@ object DataSource {
             currency = "€"
         ),
         GroupItem(
+            id = "7",
             name = "Group Toulouse",
             description = "Description 3",
             balance = 123.4,
@@ -276,6 +283,7 @@ object DataSource {
             currency = "€"
         ),
         GroupItem(
+            id = "8",
             name = "Group Paris",
             description = "Description 3",
             balance = 123.4,
@@ -307,6 +315,7 @@ object DataSource {
             currency = "€"
         ),
         GroupItem(
+            id = "9",
             name = "Group Coloc",
             description = "Description 3",
             balance = 123.4,
@@ -338,6 +347,7 @@ object DataSource {
             currency = "€"
         ),
         GroupItem(
+            id = "10",
             name = "Group sous",
             description = "Description 3",
             balance = 123.4,

@@ -25,6 +25,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +60,11 @@ fun WelcomeScreen(
 ) {
     var isDialogOpen by remember { mutableStateOf(false) }
     var receivedGroups by remember { mutableStateOf(emptyList<Group>()) }
+    val receivedGroupsItems by remember {
+        derivedStateOf {
+            receivedGroups.map { group: Group -> GroupMapper.mapToGroupItem(group) }
+        }
+    }
 
     LaunchedEffect(Unit) {
         RestClient.instance.getGroups(object : GroupsCallback {
@@ -88,7 +94,7 @@ fun WelcomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         GroupList(
-            groups = receivedGroups.map { group: Group -> GroupMapper.mapToGroupItem(group) },
+            groups = receivedGroupsItems,
             onStartOrderButtonClicked = onGroupSelected,
             onGroupSelected = onGroupSelected,
             modifier = Modifier.weight(12f)
