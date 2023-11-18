@@ -370,7 +370,7 @@ object DataSource {
         ),
     )
     private var counter = 0
-    val users = names.map { name -> User("User ${counter++}", name, groups.random().name) }
+    val users = names.map { name -> User("User ${counter++}", name) }
 
     fun getDebts(group: GroupItem?): List<Debt> {
         val userBalances = mutableMapOf<String, Double>()

@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class Debt(
     val debtorId: String,
     val creditorId: String,
-    val amount: Int
+    val amount: Double
 )

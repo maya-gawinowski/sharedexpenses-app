@@ -24,7 +24,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +47,7 @@ import com.example.sharedexpensesapp.datasource.GroupsCallback
 import com.example.sharedexpensesapp.datasource.RestClient
 import com.example.sharedexpensesapp.model.Group
 import com.example.sharedexpensesapp.model.GroupItem
+import com.example.sharedexpensesapp.utils.GroupMapper
 
 
 @Composable
@@ -55,15 +55,16 @@ fun WelcomeScreen(
     onAddGroupButtonClicked: () -> Unit,
     onJoinGroupButtonClicked: () -> Unit,
     onGroupSelected: (GroupItem) -> Unit,
-    groups: List<GroupItem>,
     modifier: Modifier = Modifier
 ) {
     var isDialogOpen by remember { mutableStateOf(false) }
     var receivedGroups by remember { mutableStateOf(emptyList<Group>()) }
+
     LaunchedEffect(Unit) {
         RestClient.instance.getGroups(object : GroupsCallback {
             override fun onSuccess(groups: List<Group>) {
-                receivedGroups= groups
+                receivedGroups = groups
+                Log.d("RestClient", "GET groups success $receivedGroups")
             }
 
             override fun onFailure(error: String) {
@@ -71,8 +72,7 @@ fun WelcomeScreen(
             }
         })
     }
-    Log.d("RestClient", "GET groups success $receivedGroups")
-    var openDialog = remember { mutableStateOf(false) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.illustration_sans_titre_35),
@@ -82,12 +82,13 @@ fun WelcomeScreen(
                 .matchParentSize()
         )
     }
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         GroupList(
-            groups = groups,
+            groups = receivedGroups.map { group: Group -> GroupMapper.mapToGroupItem(group) },
             onStartOrderButtonClicked = onGroupSelected,
             onGroupSelected = onGroupSelected,
             modifier = Modifier.weight(12f)

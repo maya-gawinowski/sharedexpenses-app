@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class Expense(
     val payerId:String,
     val participantsIds:List<String>,
-    val amount:Int,
+    val amount:Double,
     val description:String,
-    val groupId: String
+    val date: String,
 )

@@ -141,7 +141,6 @@ fun SharedExpenseApp() {
                 .padding(innerPadding)
             composable(route = SharedExpenseScreen.Start.name) {
                 WelcomeScreen(
-                    groups = DataSource.groups,
                     onAddGroupButtonClicked = {
                         navController.navigate(SharedExpenseScreen.AddGroup.name)
                     },
