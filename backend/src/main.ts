@@ -4,7 +4,9 @@ import { PORT } from './config';
 
 import morgan from 'morgan';
 import { Group } from './group';
-import { Expense, User } from './model';
+import { Expense } from './model';
+import {Datasource} from "./datasource";
+import {User} from "./user";
 
 const app = express();
 app.use(morgan('combined'));
@@ -13,18 +15,9 @@ app.listen(PORT, () => {
   console.log('Server listening on port:', PORT);
 });
 
-const Luca: User = { id: '1', name: 'Luca' };
-const Maya: User = { id: '2', name: 'Maya' };
-const Mitsch: User = { id: '3', name: 'Mitsch' };
-const Manca: User = { id: '4', name: 'Manca' };
-const users: User[] = [Luca, Maya, Mitsch, Manca];
-const group: Group = new Group(
-  [Maya, Mitsch],
-  'Group 1',
-  'This is a test group',
-);
-
-let groups: Group[] = [group];
+const datasource = new Datasource();
+let groups = datasource.getGroups();
+const users = datasource.getUsers();
 
 app.get('/status', (req: Request, res: Response) => {
   const status = {
@@ -61,9 +54,11 @@ app.post('/groups/:groupId/expenses', (req: Request, res: Response) => {
   group.addExpense(expense);
   res.json(group.getExpenses());
 });
+
 app.get('/groups', (req: Request, res: Response) => {
   res.json(groups);
 });
+
 app.post('/groups', (req: Request, res: Response) => {
   // create Group
   const groupData = req.body;
@@ -73,17 +68,18 @@ app.post('/groups', (req: Request, res: Response) => {
   }
   const newUsers: User[] = [];
   for (const uid of groupData.userIds) {
-    const user = users.find((u) => u.id == uid);
+    const user = users.find((u) => u.getId() == uid);
     if (!user) {
       res.status(404).send(`User Id ${uid} not found`);
       return;
     }
     newUsers.push(user);
   }
-  const group = new Group(newUsers, groupData.name, groupData.description);
+  const group = new Group(newUsers, groupData.name, groupData.currency, groupData.description);
   groups.push(group);
   res.status(201).json(group);
 });
+
 app.put('/groups/:groupId', (req: Request, res: Response) => {
   const groupId = req.params.groupId;
   const userIds = req.body.userIds;
@@ -95,11 +91,11 @@ app.put('/groups/:groupId', (req: Request, res: Response) => {
   const newUsers: User[] = [];
 
   for (const uid of userIds) {
-    if (group.getUsers().find((existing) => existing.id == uid)) {
+    if (group.getUsers().find((existing) => existing.getId() == uid)) {
       console.log(`User Id ${uid} already exist in the group`);
       continue;
     }
-    const user = users.find((u) => u.id == uid);
+    const user = users.find((u) => u.getId() == uid);
     if (!user) {
       res.status(404).send(`User Id ${uid} not found`);
       return;
@@ -109,6 +105,7 @@ app.put('/groups/:groupId', (req: Request, res: Response) => {
   group.addUsers(newUsers);
   res.status(200).json(group.getUsers());
 });
+
 app.delete('/groups/:groupId', (req: Request, res: Response) => {
   const groupId = req.params.groupId;
   const group = groups.find((g) => g.getId() === groupId);
