@@ -80,8 +80,9 @@ Kotlin code that allows to post data into the backend
 - create a new group
   ```kotlin
   LaunchedEffect(Unit) {
-    RestClient.instance.createGroups(listOf("1", "2"), "TestGroup", "EUR", "description )
+    RestClient.instance.createGroups(listOf("1", "2"), "TestGroup", "EUR", "description" )
   }
+  -> description is optional
   ```
 ## Methods as REST API request
 
