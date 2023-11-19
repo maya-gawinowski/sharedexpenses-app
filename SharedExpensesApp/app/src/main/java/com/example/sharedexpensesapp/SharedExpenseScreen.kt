@@ -114,7 +114,7 @@ fun SharedExpenseApp() {
     val currentScreen = SharedExpenseScreen.valueOf(
         backStackEntry?.destination?.route ?: SharedExpenseScreen.Start.name
     )
-    var selectedGroup by remember { mutableStateOf<GroupItem?>(null) }
+    var selectedGroup by remember { mutableStateOf(DataSource.groups[0]) }
 
     Scaffold(
         topBar = {
@@ -141,7 +141,6 @@ fun SharedExpenseApp() {
                 .padding(innerPadding)
             composable(route = SharedExpenseScreen.Start.name) {
                 WelcomeScreen(
-                    groups = DataSource.groups,
                     onAddGroupButtonClicked = {
                         navController.navigate(SharedExpenseScreen.AddGroup.name)
                     },
@@ -182,6 +181,7 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.AddExpense.name) {
                 AddExpenseScreen(
+                    groupId = selectedGroup.id,
                     modifier = baseModifier,
                 )
             }

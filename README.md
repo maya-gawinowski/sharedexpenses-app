@@ -25,6 +25,7 @@ Backend exposes methods (example body provided for post methods):
   "payerId": "1",
   "participantsIds": ["1", "2", "3", "4"],
   "amount": 100,
+  "date": "2023-11-18T21:16:26.567Z",
   "description": "For beers"
 }
 ```
@@ -47,6 +48,7 @@ Debts are calculated automatically based on expenses, thus no POST debts method 
 
 - DELETE `http://localhost:3000/groups/{groupId}`
 - PUT `http://localhost:3000/groups/{groupId}` -> modify group (right now only by adding users)
+- GET `http://localhost:3000/groups/{groupId}/users`
 
 ```json
 { "userIds": [1, 4] }

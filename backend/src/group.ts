@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { Debt, Expense, User } from './model';
+import { Debt, Expense } from './model';
+import {User} from "./user";
 
 export class Group {
   private readonly id: string;
@@ -8,14 +9,17 @@ export class Group {
   private expenses: Expense[] = [];
   private name: string = '';
   private description: string = '';
+  private balance: number = 0;
+  private readonly currency: string;
 
   private static nextId: number = 0;
 
-  constructor(users: User[], name: string, description?: string) {
+  constructor(users: User[], name: string, currency: string, description?: string) {
     this.users = users;
     this.id = Group.nextId.toString();
     Group.nextId += 1;
     this.name = name;
+    this.currency = currency;
     if (description != 'undefined') {
       this.description = description;
     }
@@ -23,6 +27,7 @@ export class Group {
 
   public addExpense(expense: Expense) {
     this.expenses.push(expense);
+    this.balance += expense.amount;
     const participantsIds = expense.participantsIds;
     const payerId = expense.payerId;
     const transferAmount = expense.amount / participantsIds.length;
@@ -53,6 +58,14 @@ export class Group {
   }
   public getName() {
     return this.name;
+  }
+
+  public getCurrency() {
+    return this.currency;
+  }
+
+  public getBalance() {
+    return this.balance;
   }
   public changeName(name: string) {
     this.name = name;
