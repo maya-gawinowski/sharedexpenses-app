@@ -8,30 +8,15 @@ import com.example.sharedexpensesapp.model.User
 import kotlinx.serialization.json.Json
 import okhttp3.Call
 import okhttp3.Callback
+import okhttp3.FormBody
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
-
-interface GroupsCallback {
-    fun onSuccess(groups: List<Group>)
-    fun onFailure(error: String)
-}
-
-interface ExpensesCallback {
-    fun onSuccess(expenses: List<Expense>)
-    fun onFailure(error: String)
-}
-
-interface DebtsCallback {
-    fun onSuccess(debts: List<Debt>)
-    fun onFailure(error: String)
-}
-
-interface UsersCallback {
-    fun onSuccess(users: List<User>)
-    fun onFailure(error: String)
-}
 
 class RestClient private constructor(){
     companion object{
@@ -39,6 +24,7 @@ class RestClient private constructor(){
     }
     private val client = OkHttpClient()
     private val host = "10.0.2.2:3000"
+    private val mediaType = "application/json; charset=utf-8".toMediaType()
     fun getGroups(callback: GroupsCallback){
         val url = "http://$host/groups"
         Log.d("RestClient", "GET $url")
@@ -53,14 +39,9 @@ class RestClient private constructor(){
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) callback.onFailure("Unexpected code $response")
-                    //print Headers
-                    for ((name, value) in response.headers) {
-                        Log.d("RestClient", "$name: $value")
-                    }
+
                     try {
-                        val responseBody = response.body
-                        val groupsJson = responseBody?.string() ?: ""
-                        val groups = Json.decodeFromString<List<Group>>(groupsJson)
+                        val groups = Json.decodeFromString<List<Group>>(response.body?.string() ?: "")
                         callback.onSuccess(groups)
                     } catch (e: Exception) {
                         callback.onFailure("Error parsing response: ${e.message}")
@@ -86,14 +67,8 @@ class RestClient private constructor(){
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) callback.onFailure("Unexpected code $response")
-                    //print Headers
-                    for ((name, value) in response.headers) {
-                        Log.d("RestClient", "$name: $value")
-                    }
                     try {
-                        val responseBody = response.body
-                        val expensesJson = responseBody?.string() ?: ""
-                        val expenses = Json.decodeFromString<List<Expense>>(expensesJson)
+                        val expenses = Json.decodeFromString<List<Expense>>(response.body?.string() ?: "")
                         callback.onSuccess(expenses)
                     } catch (e: Exception) {
                         callback.onFailure("Error parsing response: ${e.message}")
@@ -119,14 +94,8 @@ class RestClient private constructor(){
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) callback.onFailure("Unexpected code $response")
-                    //print Headers
-                    for ((name, value) in response.headers) {
-                        Log.d("RestClient", "$name: $value")
-                    }
                     try {
-                        val responseBody = response.body
-                        val debtJson = responseBody?.string() ?: ""
-                        val debts = Json.decodeFromString<List<Debt>>(debtJson)
+                        val debts = Json.decodeFromString<List<Debt>>(response.body?.string() ?: "")
                         callback.onSuccess(debts)
                     } catch (e: Exception) {
                         callback.onFailure("Error parsing response: ${e.message}")
@@ -152,20 +121,37 @@ class RestClient private constructor(){
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) callback.onFailure("Unexpected code $response")
-                    //print Headers
-                    for ((name, value) in response.headers) {
-                        Log.d("RestClient", "$name: $value")
-                    }
                     try {
-                        val responseBody = response.body
-                        val usersJson = responseBody?.string() ?: ""
-                        val users = Json.decodeFromString<List<User>>(usersJson)
+                        val users = Json.decodeFromString<List<User>>(response.body?.string() ?: "")
                         callback.onSuccess(users)
                     } catch (e: Exception) {
                         callback.onFailure("Error parsing response: ${e.message}")
                     } finally {
                         response.close()
                     }
+                }
+            }
+        })
+    }
+    fun createGroups(userIds: List<String>, name: String, currency: String, description: String=""){
+        val url = "http://$host/groups"
+        Log.d("RestClient", "POST $url")
+        val body = """{"userIds":${userIds},"name":"$name", "currency":"$currency","description":"$description"}"""
+        Log.d("RestClient",body)
+        val request = Request.Builder()
+            .url(url)
+            .post(body.toRequestBody(mediaType))
+            .build()
+        Log.d("RestClient",request.toString())
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) Log.d("RestClient","Unexpected code $response")
+                    Log.d("RestClient", "POST group success ${response.body?.string()}")
                 }
             }
         })
