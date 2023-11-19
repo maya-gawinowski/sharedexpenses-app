@@ -1,8 +1,8 @@
 package com.example.sharedexpensesapp.model
 
 data class ExpenseItem(
-    open val participant: String,
-    open val amount: Double,
-    open val description: String,
-    open val date: String
+    val payerId: String,
+    val amount: Double,
+    val description: String,
+    val date: String
 )

@@ -36,9 +36,11 @@ import androidx.compose.ui.unit.sp
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.datasource.ExpensesCallback
 import com.example.sharedexpensesapp.datasource.RestClient
+import com.example.sharedexpensesapp.datasource.UsersCallback
 import com.example.sharedexpensesapp.model.Expense
 import com.example.sharedexpensesapp.model.ExpenseItem
 import com.example.sharedexpensesapp.model.GroupItem
+import com.example.sharedexpensesapp.model.User
 import com.example.sharedexpensesapp.utils.GroupMapper
 
 @Composable
@@ -52,6 +54,12 @@ fun GroupScreen(
     val receivedExpensesItems by remember {
         derivedStateOf {
             receivedExpenses.map { expense -> GroupMapper.mapToExpenseItem(expense) }
+        }
+    }
+    var receivedUsers by remember { mutableStateOf(emptyList<User>()) }
+    val receivedUsersMap by remember {
+        derivedStateOf {
+            receivedUsers.associate { it.id to it.name }
         }
     }
 
@@ -68,6 +76,20 @@ fun GroupScreen(
         }, selectedGroup!!.id)
     }
 
+    LaunchedEffect(Unit) {
+        RestClient.instance.getUsers(object : UsersCallback {
+            override fun onSuccess(users: List<User>) {
+                receivedUsers = users
+                Log.d("RestClient", "GET users success $receivedUsers")
+            }
+
+            override fun onFailure(error: String) {
+                Log.d("RestClient", "GET users error $error")
+            }
+        }, selectedGroup!!.id)
+    }
+
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.illustration_sans_titre_35),
@@ -83,7 +105,11 @@ fun GroupScreen(
         ExpenseBar(selectedGroup = selectedGroup, modifier = modifier.fillMaxWidth())
         LazyColumn(modifier = Modifier.weight(50f)) {
             items(receivedExpensesItems) { expenseItem ->
-                ExpenseCard(expense = expenseItem, selectedGroup = selectedGroup)
+                ExpenseCard(
+                    expense = expenseItem,
+                    selectedGroup = selectedGroup,
+                    users = receivedUsersMap
+                )
             }
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -155,7 +181,12 @@ fun ExpenseBar(
 }
 
 @Composable
-fun ExpenseCard(modifier: Modifier = Modifier, expense: ExpenseItem, selectedGroup: GroupItem?) {
+fun ExpenseCard(
+    modifier: Modifier = Modifier,
+    expense: ExpenseItem,
+    selectedGroup: GroupItem?,
+    users: Map<String, String>
+) {
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
@@ -179,7 +210,7 @@ fun ExpenseCard(modifier: Modifier = Modifier, expense: ExpenseItem, selectedGro
                     color = colorResource(R.color.main_purple)
                 )
                 Text(
-                    text = "Payed by " + expense.participant,
+                    text = "Payed by ${users[expense.payerId]}",
                     color = colorResource(R.color.main_purple)
                 )
             }
@@ -202,6 +233,7 @@ fun ExpenseCard(modifier: Modifier = Modifier, expense: ExpenseItem, selectedGro
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun PreviewCreateGroupScreen() {

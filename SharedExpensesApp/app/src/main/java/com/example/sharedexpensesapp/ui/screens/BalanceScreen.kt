@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,11 +25,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sharedexpensesapp.R
-import com.example.sharedexpensesapp.datasource.DataSource
 import com.example.sharedexpensesapp.datasource.DebtsCallback
 import com.example.sharedexpensesapp.datasource.RestClient
 import com.example.sharedexpensesapp.datasource.UsersCallback
@@ -47,7 +44,7 @@ fun BalanceScreen(
     var receivedUsers by remember { mutableStateOf(emptyList<User>()) }
     val receivedUsersMap by remember {
         derivedStateOf {
-            receivedUsers.map { it.id to it.name }.toMap()
+            receivedUsers.associate { it.id to it.name }
         }
     }
 
@@ -136,10 +133,3 @@ fun DebtCard(debt: Debt, group: GroupItem?, users: Map<String, String>) {
         }
     }
 }
-
-@Preview
-@Composable
-fun BalancePreview() {
-    BalanceScreen(group = DataSource.groups[0], modifier = Modifier.fillMaxSize())
-}
-

@@ -1,7 +1,6 @@
 package com.example.sharedexpensesapp.ui.screens
 
-import android.os.Build
-import androidx.annotation.RequiresApi
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +29,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,7 +47,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sharedexpensesapp.R
-import com.example.sharedexpensesapp.datasource.DataSource
+import com.example.sharedexpensesapp.datasource.RestClient
+import com.example.sharedexpensesapp.datasource.UsersCallback
+import com.example.sharedexpensesapp.model.User
 import com.example.sharedexpensesapp.utils.CurrencyAmountInputVisualTransformation
 import com.example.sharedexpensesapp.utils.DropDownMenuStateHolder
 import com.example.sharedexpensesapp.utils.ReadonlyTextField
@@ -57,13 +59,14 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(
+    groupId: String,
     modifier: Modifier = Modifier,
     currencySymbol: String = "EUR"
 ) {
-    val users = DataSource.users
+
     var description by remember { mutableStateOf("") }
     var amountInput by remember { mutableStateOf("") }
     var pickedDate by remember { mutableStateOf(LocalDate.now()) }
@@ -74,19 +77,33 @@ fun AddExpenseScreen(
         }
     }
     val dateDialogState = rememberMaterialDialogState()
-    val dropDownMenuStateHolder = remember {
-        DropDownMenuStateHolder(users.map { user -> user.name })
-    }
-    var participants by remember {
+    var dropDownMenuStateHolder by remember {
         mutableStateOf(
-            users.map {
-                UserListItem(
-                    title = it.name,
-                    id = it.id,
-                    isSelected = true,
-                )
-            }
+            DropDownMenuStateHolder(emptyList())
         )
+
+    }
+    var participants by remember { mutableStateOf(emptyList<UserListItem>()) }
+
+    LaunchedEffect(Unit) {
+        RestClient.instance.getUsers(object : UsersCallback {
+            override fun onSuccess(users: List<User>) {
+                participants = users.map {
+                    UserListItem(
+                        title = it.name,
+                        id = it.id,
+                        isSelected = true,
+                    )
+                }
+                dropDownMenuStateHolder =
+                    DropDownMenuStateHolder(users.map { user -> user.name })
+                Log.d("RestClient", "GET users success $users")
+            }
+
+            override fun onFailure(error: String) {
+                Log.d("RestClient", "GET users error $error")
+            }
+        }, groupId)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -128,7 +145,36 @@ fun AddExpenseScreen(
             Text(text = "Date")
         }
         Spacer(Modifier.size(16.dp))
-        PayerDropDownMenu(dropDownMenuStateHolder)
+        // for some reason extracting this component to a function stops it from updating its state
+        ExposedDropdownMenuBox(
+            expanded = dropDownMenuStateHolder.expanded,
+            onExpandedChange = { dropDownMenuStateHolder.expanded = it }) {
+            OutlinedTextField(
+                value = dropDownMenuStateHolder.value,
+                onValueChange = {},
+                label = { Text(text = "Payed by") },
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownMenuStateHolder.expanded)
+                },
+                placeholder = {
+                    Text(text = "Payed by")
+                },
+                modifier = Modifier.menuAnchor(),
+            )
+            ExposedDropdownMenu(
+                expanded = dropDownMenuStateHolder.expanded,
+                onDismissRequest = { dropDownMenuStateHolder.expanded = false })
+            {
+                dropDownMenuStateHolder.items.forEachIndexed { index, s ->
+                    DropdownMenuItem(
+                        text = { Text(text = s) },
+                        onClick = {
+                            dropDownMenuStateHolder.select(index)
+                        })
+                }
+            }
+        }
         Spacer(Modifier.size(16.dp))
         Row(
             horizontalArrangement = Arrangement.Start,
@@ -212,40 +258,6 @@ fun AddExpenseScreen(
             title = "Pick a date",
         ) {
             pickedDate = it
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun PayerDropDownMenu(dropDownMenuStateHolder: DropDownMenuStateHolder) {
-    ExposedDropdownMenuBox(
-        expanded = dropDownMenuStateHolder.expanded,
-        onExpandedChange = { dropDownMenuStateHolder.expanded = it }) {
-        OutlinedTextField(
-            value = dropDownMenuStateHolder.value,
-            onValueChange = {},
-            label = { Text(text = "Payed by") },
-            readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownMenuStateHolder.expanded)
-            },
-            placeholder = {
-                Text(text = "Payed by")
-            },
-            modifier = Modifier.menuAnchor(),
-        )
-        ExposedDropdownMenu(
-            expanded = dropDownMenuStateHolder.expanded,
-            onDismissRequest = { dropDownMenuStateHolder.expanded = false })
-        {
-            dropDownMenuStateHolder.items.forEachIndexed { index, s ->
-                DropdownMenuItem(
-                    text = { Text(text = s) },
-                    onClick = {
-                        dropDownMenuStateHolder.select(index)
-                    })
-            }
         }
     }
 }
