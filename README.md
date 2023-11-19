@@ -82,8 +82,8 @@ Kotlin code that allows to post data into the backend
   LaunchedEffect(Unit) {
     RestClient.instance.createGroups(listOf("1", "2"), "TestGroup", "EUR", "description" )
   }
-  -> description is optional
   ```
+  -> description is optional
 ## Methods as REST API request
 
 Backend exposes methods (example body provided for post methods):
