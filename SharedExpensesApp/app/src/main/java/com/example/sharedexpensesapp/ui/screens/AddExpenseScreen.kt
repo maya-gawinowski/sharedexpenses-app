@@ -84,14 +84,12 @@ fun AddExpenseScreen(
         mutableStateOf(
             DropDownMenuStateHolder(emptyList())
         )
-
     }
-    var receivedUsers by remember { mutableStateOf(emptyList<User>()) }
 
     LaunchedEffect(Unit) {
+        addExpenseViewModel.fetchUsers(groupId)
         RestClient.instance.getUsers(object : UsersCallback {
             override fun onSuccess(users: List<User>) {
-                receivedUsers = users
                 dropDownMenuStateHolder =
                     DropDownMenuStateHolder(users.map { user -> user.name })
                 Log.d("RestClient", "GET users success $users")
@@ -185,7 +183,7 @@ fun AddExpenseScreen(
         }
         Spacer(Modifier.size(16.dp))
         ParticipantsList(
-            participants = addExpenseViewModel.participants,
+            participants = addExpenseViewModel.participants.value,
             onParticipantClicked = { expenseParticipant ->
                 addExpenseViewModel.toggleParticipantSelected(
                     expenseParticipant
