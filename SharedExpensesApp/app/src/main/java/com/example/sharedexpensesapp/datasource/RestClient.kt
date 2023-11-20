@@ -135,7 +135,6 @@ class RestClient private constructor(){
         Log.d("RestClient", "POST $url")
         val idsStringify= userIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
         val body = """{"userIds":${idsStringify},"name":"$name", "currency":"$currency","description":"$description"}"""
-        Log.d("RestClient", body)
         val request = Request.Builder()
             .url(url)
             .post(body.toRequestBody(mediaType))
@@ -158,7 +157,6 @@ class RestClient private constructor(){
         val idsStringify= participantsIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
         val body = """{"payerId":"$payerId", "participantsIds":$idsStringify, "amount":$amount, "date":"$date", "description":"$description"}"""
         Log.d("RestClient", "POST $url")
-        Log.d("RestClient", body)
         val request = Request.Builder()
             .url(url)
             .post(body.toRequestBody(mediaType))
@@ -191,6 +189,27 @@ class RestClient private constructor(){
                 response.use {
                     if (!response.isSuccessful) Log.d("RestClient","Unexpected code $response")
                     Log.d("RestClient", "Response DELETE group: ${response.body?.string()}")
+                }
+            }
+        })
+    }
+    fun addUsersToGroup(groupId: String, userIds: List<String>){
+        val url = "http://$host/groups/$groupId"
+        Log.d("RestClient", "PUT $url")
+        val idsStringify= userIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
+        val body = """{"addUserIds":$idsStringify}"""
+        val request = Request.Builder()
+            .url(url)
+            .put(body.toRequestBody(mediaType))
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) Log.d("RestClient", "Unexpected code $response")
+                    Log.d("RestClient", "Response PUT add User: ${response.body?.string()}")
                 }
             }
         })
