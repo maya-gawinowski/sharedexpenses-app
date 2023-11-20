@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.datasource.RestClient
 import com.example.sharedexpensesapp.datasource.UsersCallback
@@ -64,7 +66,8 @@ import java.time.format.DateTimeFormatter
 fun AddExpenseScreen(
     groupId: String,
     modifier: Modifier = Modifier,
-    currencySymbol: String = "EUR"
+    currencySymbol: String = "EUR",
+    addExpenseViewModel: AddExpenseViewModel = viewModel()
 ) {
 
     var description by remember { mutableStateOf("") }
@@ -83,18 +86,12 @@ fun AddExpenseScreen(
         )
 
     }
-    var participants by remember { mutableStateOf(emptyList<UserListItem>()) }
+    var receivedUsers by remember { mutableStateOf(emptyList<User>()) }
 
     LaunchedEffect(Unit) {
         RestClient.instance.getUsers(object : UsersCallback {
             override fun onSuccess(users: List<User>) {
-                participants = users.map {
-                    UserListItem(
-                        title = it.name,
-                        id = it.id,
-                        isSelected = true,
-                    )
-                }
+                receivedUsers = users
                 dropDownMenuStateHolder =
                     DropDownMenuStateHolder(users.map { user -> user.name })
                 Log.d("RestClient", "GET users success $users")
@@ -187,50 +184,16 @@ fun AddExpenseScreen(
             )
         }
         Spacer(Modifier.size(16.dp))
-        LazyColumn(
+        ParticipantsList(
+            participants = addExpenseViewModel.participants,
+            onParticipantClicked = { expenseParticipant ->
+                addExpenseViewModel.toggleParticipantSelected(
+                    expenseParticipant
+                )
+            },
             modifier = Modifier
                 .weight(12f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            items(participants.size) { i ->
-                ElevatedCard(
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 6.dp
-                    ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = colorResource(R.color.card_orange),
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .padding(5.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                participants = participants.mapIndexed { j, item ->
-                                    if (i == j) {
-                                        item.copy(isSelected = !item.isSelected)
-                                    } else item
-                                }
-                            }
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = participants[i].title)
-                        if (participants[i].isSelected) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Selected",
-                                tint = Color(0xff3b6e44),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        )
         Spacer(Modifier.size(16.dp))
         Button(
             onClick = { },
@@ -262,8 +225,67 @@ fun AddExpenseScreen(
     }
 }
 
-data class UserListItem(
-    val title: String,
-    val id: String,
-    val isSelected: Boolean,
-)
+@Composable
+fun ParticipantsList(
+    participants: List<ExpenseParticipant>,
+    onParticipantClicked: (ExpenseParticipant) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        items(participants) { expenseParticipant ->
+            ParticipantCard(
+                participant = expenseParticipant,
+                checked = expenseParticipant.selected,
+                onClicked = { onParticipantClicked(expenseParticipant) },
+                )
+        }
+    }
+}
+
+
+@Composable
+private fun ParticipantCard(
+    participant: ExpenseParticipant,
+    checked: Boolean,
+    onClicked: () -> Unit,
+) {
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = colorResource(R.color.card_orange),
+        ),
+        modifier = Modifier
+            .fillMaxWidth(0.75f)
+            .padding(5.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(enabled = true, onClick = onClicked)
+//                    participants1 = participants1.mapIndexed { j, item ->
+//                        if (i == j) {
+//                            item.copy(isSelected = !item.isSelected)
+//                        } else item
+//                    }
+
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = participant.name)
+            if (checked) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Selected",
+                    tint = Color(0xff3b6e44),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+}
