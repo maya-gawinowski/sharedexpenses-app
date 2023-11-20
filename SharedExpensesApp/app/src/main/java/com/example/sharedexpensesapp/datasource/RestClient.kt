@@ -8,12 +8,9 @@ import com.example.sharedexpensesapp.model.User
 import kotlinx.serialization.json.Json
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.FormBody
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
@@ -136,13 +133,13 @@ class RestClient private constructor(){
     fun createGroups(userIds: List<String>, name: String, currency: String, description: String=""){
         val url = "http://$host/groups"
         Log.d("RestClient", "POST $url")
-        val body = """{"userIds":${userIds},"name":"$name", "currency":"$currency","description":"$description"}"""
-        Log.d("RestClient",body)
+        val idsStringify= userIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
+        val body = """{"userIds":${idsStringify},"name":"$name", "currency":"$currency","description":"$description"}"""
+        Log.d("RestClient", body)
         val request = Request.Builder()
             .url(url)
             .post(body.toRequestBody(mediaType))
             .build()
-        Log.d("RestClient",request.toString())
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
@@ -151,10 +148,32 @@ class RestClient private constructor(){
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) Log.d("RestClient","Unexpected code $response")
-                    Log.d("RestClient", "POST group success ${response.body?.string()}")
+                    Log.d("RestClient", "Response POST group: ${response.body?.string()}")
                 }
             }
         })
     }
+    fun addExpense(groupId: String, payerId:String,participantsIds:List<String>, amount:Double, date:String, description: String=""){
+        val url = "http://$host/groups/$groupId/expenses"
+        val idsStringify= participantsIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
+        val body = """{"payerId":"$payerId", "participantsIds":$idsStringify, "amount":$amount, "date":"$date", "description":"$description"}"""
+        Log.d("RestClient", "POST $url")
+        Log.d("RestClient", body)
+        val request = Request.Builder()
+            .url(url)
+            .post(body.toRequestBody(mediaType))
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
 
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) Log.d("RestClient","Unexpected code $response")
+                    Log.d("RestClient", "Response POST add expenses: ${response.body?.string()}")
+                }
+            }
+        })
+    }
 }
