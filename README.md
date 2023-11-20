@@ -84,6 +84,12 @@ Kotlin code that allows to post data into the backend
   }
   ```
   -> description is optional
+- delete group
+  ```kotlin
+  LaunchedEffect(Unit) {
+    RestClient.instance.deleteGroup("4")
+  }
+  ```
 - add Expenses to a group
   ```kotlin
   LaunchedEffect(Unit) {
