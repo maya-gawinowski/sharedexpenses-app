@@ -1,18 +1,4 @@
-# Backend
-
-## Run
-
-To run backend move to the `backend` directory and run
-
-```bash
-npm run start
-```
-
-This will run a server listening on `localhost:3000`
-
-One group with four users is hardcoded.
-
-
+# Frontend
 ## API Methods using the RestClient
 Kotlin code that allows to post data into the backend
 ### GET
@@ -96,6 +82,12 @@ Kotlin code that allows to post data into the backend
     RestClient.instance.addUsersToGroup("4", listOf("2", "4"))
   }
   ```
+- remove Users from Group
+  ```kotlin
+  LaunchedEffect(Unit) {
+    RestClient.instance.removeUsersFromGroup("0", listOf("2", "4"))
+  }
+  ```
 - add Expenses to a group
   ```kotlin
   LaunchedEffect(Unit) {
@@ -103,7 +95,21 @@ Kotlin code that allows to post data into the backend
   }
   ```
   -> description is optional
-## Methods as REST API request
+# Backend
+
+## Run
+
+To run backend move to the `backend` directory and run
+
+```bash
+npm run start
+```
+
+This will run a server listening on `localhost:3000`
+
+One group with four users is hardcoded.
+
+## REST API requests
 
 Backend exposes methods (example body provided for post methods):
 
