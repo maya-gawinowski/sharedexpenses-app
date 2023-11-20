@@ -90,6 +90,12 @@ Kotlin code that allows to post data into the backend
     RestClient.instance.deleteGroup("4")
   }
   ```
+- add Users to Group
+  ```kotlin
+  LaunchedEffect(Unit) {
+    RestClient.instance.addUsersToGroup("4", listOf("2", "4"))
+  }
+  ```
 - add Expenses to a group
   ```kotlin
   LaunchedEffect(Unit) {
@@ -126,6 +132,7 @@ Debts are calculated automatically based on expenses, thus no POST debts method 
   "userIds": ["1", "3"],
   "name": "group 1",
   "description": "test group"
+  "currency": "EUR"
 }
 ```
 
