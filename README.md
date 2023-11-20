@@ -84,6 +84,13 @@ Kotlin code that allows to post data into the backend
   }
   ```
   -> description is optional
+- add Expenses to a group
+  ```kotlin
+  LaunchedEffect(Unit) {
+    RestClient.instance.addExpense("0","1", listOf("1","2"),25.2, "2023-11-18T21:16:26.567Z", "for beers")
+  }
+  ```
+  -> description is optional
 ## Methods as REST API request
 
 Backend exposes methods (example body provided for post methods):
