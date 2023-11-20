@@ -1,6 +1,5 @@
 package com.example.sharedexpensesapp.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,11 +19,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -49,11 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedexpensesapp.R
-import com.example.sharedexpensesapp.datasource.RestClient
-import com.example.sharedexpensesapp.datasource.UsersCallback
-import com.example.sharedexpensesapp.model.User
+import com.example.sharedexpensesapp.ui.screens.composables.DropdownIndexed
 import com.example.sharedexpensesapp.utils.CurrencyAmountInputVisualTransformation
-import com.example.sharedexpensesapp.utils.DropDownMenuStateHolder
 import com.example.sharedexpensesapp.utils.ReadonlyTextField
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -61,7 +53,6 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(
     groupId: String,
@@ -75,30 +66,17 @@ fun AddExpenseScreen(
     var pickedDate by remember { mutableStateOf(LocalDate.now()) }
     val formattedDate by remember {
         derivedStateOf {
-            DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                .format(pickedDate)
+            DateTimeFormatter.ofPattern("dd-MM-yyyy").format(pickedDate)
         }
     }
     val dateDialogState = rememberMaterialDialogState()
-    var dropDownMenuStateHolder by remember {
-        mutableStateOf(
-            DropDownMenuStateHolder(emptyList())
-        )
+    val userNames by remember {
+        derivedStateOf {
+            addExpenseViewModel.participants.value.map { participant: ExpenseParticipant -> participant.name } }
     }
 
     LaunchedEffect(Unit) {
         addExpenseViewModel.fetchUsers(groupId)
-        RestClient.instance.getUsers(object : UsersCallback {
-            override fun onSuccess(users: List<User>) {
-                dropDownMenuStateHolder =
-                    DropDownMenuStateHolder(users.map { user -> user.name })
-                Log.d("RestClient", "GET users success $users")
-            }
-
-            override fun onFailure(error: String) {
-                Log.d("RestClient", "GET users error $error")
-            }
-        }, groupId)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -106,13 +84,11 @@ fun AddExpenseScreen(
             painter = painterResource(R.drawable.illustration_sans_titre_35),
             contentDescription = "Fond image",
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .matchParentSize()
+            modifier = Modifier.matchParentSize()
         )
     }
     Column(
-        modifier = modifier
-            .padding(16.dp),
+        modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
@@ -140,41 +116,21 @@ fun AddExpenseScreen(
             Text(text = "Date")
         }
         Spacer(Modifier.size(16.dp))
-        // for some reason extracting this component to a function stops it from updating its state
-        ExposedDropdownMenuBox(
-            expanded = dropDownMenuStateHolder.expanded,
-            onExpandedChange = { dropDownMenuStateHolder.expanded = it }) {
-            OutlinedTextField(
-                value = dropDownMenuStateHolder.value,
-                onValueChange = {},
-                label = { Text(text = "Payed by") },
-                readOnly = true,
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownMenuStateHolder.expanded)
-                },
-                placeholder = {
-                    Text(text = "Payed by")
-                },
-                modifier = Modifier.menuAnchor(),
-            )
-            ExposedDropdownMenu(
-                expanded = dropDownMenuStateHolder.expanded,
-                onDismissRequest = { dropDownMenuStateHolder.expanded = false })
-            {
-                dropDownMenuStateHolder.items.forEachIndexed { index, s ->
-                    DropdownMenuItem(
-                        text = { Text(text = s) },
-                        onClick = {
-                            dropDownMenuStateHolder.select(index)
-                        })
-                }
-            }
-        }
+        DropdownIndexed(
+            label = "Payed by",
+            placeholder = "Payed by",
+            items = userNames,
+            onValueChange = {},
+            onIndexSelected = { selectedIndex ->
+                val selectedPayer: ExpenseParticipant =
+                    addExpenseViewModel.participants.value[selectedIndex]
+                addExpenseViewModel.payerId.value = selectedPayer.userId
+            },
+        )
         Spacer(Modifier.size(16.dp))
         Row(
             horizontalArrangement = Arrangement.Start,
-            modifier = Modifier
-                .fillMaxWidth(0.75f)
+            modifier = Modifier.fillMaxWidth(0.75f)
         ) {
             Text(
                 text = "Split among:",
@@ -189,8 +145,7 @@ fun AddExpenseScreen(
                     expenseParticipant
                 )
             },
-            modifier = Modifier
-                .weight(12f),
+            modifier = Modifier.weight(12f),
         )
         Spacer(Modifier.size(16.dp))
         Button(
@@ -207,13 +162,10 @@ fun AddExpenseScreen(
         }
     }
 
-    MaterialDialog(
-        dialogState = dateDialogState,
-        buttons = {
-            positiveButton(text = "Ok")
-            negativeButton(text = "Cancel")
-        }
-    ) {
+    MaterialDialog(dialogState = dateDialogState, buttons = {
+        positiveButton(text = "Ok")
+        negativeButton(text = "Cancel")
+    }) {
         datepicker(
             initialDate = LocalDate.now(),
             title = "Pick a date",
@@ -238,7 +190,7 @@ fun ParticipantsList(
                 participant = expenseParticipant,
                 checked = expenseParticipant.selected,
                 onClicked = { onParticipantClicked(expenseParticipant) },
-                )
+            )
         }
     }
 }
@@ -265,12 +217,6 @@ private fun ParticipantCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(enabled = true, onClick = onClicked)
-//                    participants1 = participants1.mapIndexed { j, item ->
-//                        if (i == j) {
-//                            item.copy(isSelected = !item.isSelected)
-//                        } else item
-//                    }
-
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically

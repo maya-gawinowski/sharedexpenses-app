@@ -1,6 +1,7 @@
 package com.example.sharedexpensesapp.ui.screens
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +15,10 @@ class AddExpenseViewModel : ViewModel() {
     private val _participants = mutableStateOf(emptyList<ExpenseParticipant>())
     val participants: State<List<ExpenseParticipant>>
         get() = _participants
+
+    private val _payerId = mutableStateOf<String?>(null)
+    val payerId: MutableState<String?>
+        get() = _payerId
 
     fun toggleParticipantSelected(participant: ExpenseParticipant) =
         participants.value.find { it.userId == participant.userId }?.let { p ->
@@ -30,7 +35,6 @@ class AddExpenseViewModel : ViewModel() {
                     )
                 }
             }
-
             override fun onFailure(error: String) {
                 Log.d("RestClient", "GET users error $error")
             }
