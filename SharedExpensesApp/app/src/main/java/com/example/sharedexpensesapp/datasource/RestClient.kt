@@ -214,4 +214,25 @@ class RestClient private constructor(){
             }
         })
     }
+    fun removeUsersFromGroup(groupId: String, userIds: List<String>){
+        val url = "http://$host/groups/$groupId"
+        Log.d("RestClient", "PUT $url")
+        val idsStringify= userIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
+        val body = """{"removeUserIds":$idsStringify}"""
+        val request = Request.Builder()
+            .url(url)
+            .put(body.toRequestBody(mediaType))
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) Log.d("RestClient", "Unexpected code $response")
+                    Log.d("RestClient", "Response PUT remove User: ${response.body?.string()}")
+                }
+            }
+        })
+    }
 }
