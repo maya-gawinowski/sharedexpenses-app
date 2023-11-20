@@ -176,4 +176,23 @@ class RestClient private constructor(){
             }
         })
     }
+    fun deleteGroup(groupId:String){
+        val url = "http://$host/groups/$groupId"
+        val request = Request.Builder()
+            .url(url)
+            .delete()
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) Log.d("RestClient","Unexpected code $response")
+                    Log.d("RestClient", "Response DELETE group: ${response.body?.string()}")
+                }
+            }
+        })
+    }
 }
