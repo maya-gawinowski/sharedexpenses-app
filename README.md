@@ -1,18 +1,4 @@
-# Backend
-
-## Run
-
-To run backend move to the `backend` directory and run
-
-```bash
-npm run start
-```
-
-This will run a server listening on `localhost:3000`
-
-One group with four users is hardcoded.
-
-
+# Frontend
 ## API Methods using the RestClient
 Kotlin code that allows to post data into the backend
 ### GET
@@ -80,10 +66,50 @@ Kotlin code that allows to post data into the backend
 - create a new group
   ```kotlin
   LaunchedEffect(Unit) {
-    RestClient.instance.createGroups(listOf("1", "2"), "TestGroup", "EUR", "description )
+    RestClient.instance.createGroups(listOf("1", "2"), "TestGroup", "EUR", "description" )
   }
   ```
-## Methods as REST API request
+  -> description is optional
+- delete group
+  ```kotlin
+  LaunchedEffect(Unit) {
+    RestClient.instance.deleteGroup("4")
+  }
+  ```
+- add Users to Group
+  ```kotlin
+  LaunchedEffect(Unit) {
+    RestClient.instance.addUsersToGroup("4", listOf("2", "4"))
+  }
+  ```
+- remove Users from Group
+  ```kotlin
+  LaunchedEffect(Unit) {
+    RestClient.instance.removeUsersFromGroup("0", listOf("2", "4"))
+  }
+  ```
+- add Expenses to a group
+  ```kotlin
+  LaunchedEffect(Unit) {
+    RestClient.instance.addExpense("0","1", listOf("1","2"),25.2, "2023-11-18T21:16:26.567Z", "for beers")
+  }
+  ```
+  -> description is optional
+# Backend
+
+## Run
+
+To run backend move to the `backend` directory and run
+
+```bash
+npm run start
+```
+
+This will run a server listening on `localhost:3000`
+
+One group with four users is hardcoded.
+
+## REST API requests
 
 Backend exposes methods (example body provided for post methods):
 
@@ -112,6 +138,7 @@ Debts are calculated automatically based on expenses, thus no POST debts method 
   "userIds": ["1", "3"],
   "name": "group 1",
   "description": "test group"
+  "currency": "EUR"
 }
 ```
 
