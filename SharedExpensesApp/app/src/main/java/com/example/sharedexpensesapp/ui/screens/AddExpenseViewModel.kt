@@ -10,8 +10,13 @@ import androidx.lifecycle.ViewModel
 import com.example.sharedexpensesapp.datasource.RestClient
 import com.example.sharedexpensesapp.datasource.UsersCallback
 import com.example.sharedexpensesapp.model.User
+import java.time.LocalDate
 
 class AddExpenseViewModel : ViewModel() {
+    var pickedDate: LocalDate by mutableStateOf(LocalDate.now())
+    var description by mutableStateOf("")
+    var amountInput by mutableStateOf("")
+
     private val _participants = mutableStateOf(emptyList<ExpenseParticipant>())
     val participants: State<List<ExpenseParticipant>>
         get() = _participants
@@ -39,6 +44,10 @@ class AddExpenseViewModel : ViewModel() {
                 Log.d("RestClient", "GET users error $error")
             }
         }, groupId)
+    }
+
+    fun saveExpense(groupId: String) {
+        // handle saving expense logic
     }
 }
 

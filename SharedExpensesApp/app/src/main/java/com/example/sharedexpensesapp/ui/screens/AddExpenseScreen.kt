@@ -28,9 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,19 +59,17 @@ fun AddExpenseScreen(
     addExpenseViewModel: AddExpenseViewModel = viewModel()
 ) {
 
-    var description by remember { mutableStateOf("") }
-    var amountInput by remember { mutableStateOf("") }
-    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
     val formattedDate by remember {
         derivedStateOf {
-            DateTimeFormatter.ofPattern("dd-MM-yyyy").format(pickedDate)
+            DateTimeFormatter.ofPattern("dd-MM-yyyy").format(addExpenseViewModel.pickedDate)
+        }
+    }
+    val userNames by remember {
+        derivedStateOf {
+            addExpenseViewModel.participants.value.map { participant: ExpenseParticipant -> participant.name }
         }
     }
     val dateDialogState = rememberMaterialDialogState()
-    val userNames by remember {
-        derivedStateOf {
-            addExpenseViewModel.participants.value.map { participant: ExpenseParticipant -> participant.name } }
-    }
 
     LaunchedEffect(Unit) {
         addExpenseViewModel.fetchUsers(groupId)
@@ -92,15 +88,15 @@ fun AddExpenseScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
+            value = addExpenseViewModel.description,
+            onValueChange = { addExpenseViewModel.description = it },
             label = { Text("Expense description") },
             singleLine = true,
         )
         Spacer(Modifier.size(16.dp))
         OutlinedTextField(
-            value = amountInput,
-            onValueChange = { amountInput = it },
+            value = addExpenseViewModel.amountInput,
+            onValueChange = { addExpenseViewModel.amountInput = it },
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             visualTransformation = CurrencyAmountInputVisualTransformation(),
@@ -149,7 +145,9 @@ fun AddExpenseScreen(
         )
         Spacer(Modifier.size(16.dp))
         Button(
-            onClick = { },
+            onClick = {
+                addExpenseViewModel.saveExpense(groupId)
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -170,7 +168,7 @@ fun AddExpenseScreen(
             initialDate = LocalDate.now(),
             title = "Pick a date",
         ) {
-            pickedDate = it
+            addExpenseViewModel.pickedDate = it
         }
     }
 }
