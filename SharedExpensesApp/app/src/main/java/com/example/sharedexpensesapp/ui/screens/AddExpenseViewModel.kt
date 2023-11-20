@@ -47,7 +47,16 @@ class AddExpenseViewModel : ViewModel() {
     }
 
     fun saveExpense(groupId: String) {
-        // handle saving expense logic
+        RestClient.instance.addExpense(
+            groupId = groupId,
+            payerId = payerId.value!!,
+            participantsIds = participants.value
+                .filter { expenseParticipant -> expenseParticipant.selected }
+                .map { expenseParticipant -> expenseParticipant.userId },
+            amount = amountInput.toDouble() / 100,
+            date = pickedDate.toString(),
+            description = description
+        )
     }
 }
 

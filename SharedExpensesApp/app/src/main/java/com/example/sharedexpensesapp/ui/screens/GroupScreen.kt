@@ -157,7 +157,7 @@ fun ExpenseBar(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "${selectedGroup?.balance.toString()} ${selectedGroup?.currency}",
+                text = "${String.format("%.2f", selectedGroup?.balance)} ${selectedGroup?.currency}",
                 color = Color.White,
                 fontSize = 25.sp
             )
@@ -172,7 +172,7 @@ fun ExpenseBar(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "${selectedGroup?.balance.toString()} ${selectedGroup?.currency}",
+                text = "${String.format("%.2f", selectedGroup?.balance)} ${selectedGroup?.currency}",
                 color = Color.White
             )
         }
@@ -218,7 +218,7 @@ fun ExpenseCard(
             Column {
                 if (selectedGroup != null) {
                     Text(
-                        text = "${expense.amount} ${selectedGroup.currency}",
+                        text = "${String.format("%.2f", expense.amount)} ${selectedGroup.currency}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = colorResource(R.color.main_orange)

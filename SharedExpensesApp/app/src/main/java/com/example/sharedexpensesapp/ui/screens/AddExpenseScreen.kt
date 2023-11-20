@@ -54,6 +54,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun AddExpenseScreen(
     groupId: String,
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     currencySymbol: String = "EUR",
     addExpenseViewModel: AddExpenseViewModel = viewModel()
@@ -67,6 +68,11 @@ fun AddExpenseScreen(
     val userNames by remember {
         derivedStateOf {
             addExpenseViewModel.participants.value.map { participant: ExpenseParticipant -> participant.name }
+        }
+    }
+    val isExpenseValid by remember {
+        derivedStateOf {
+            addExpenseViewModel.payerId.value != null && addExpenseViewModel.amountInput != ""
         }
     }
     val dateDialogState = rememberMaterialDialogState()
@@ -147,7 +153,9 @@ fun AddExpenseScreen(
         Button(
             onClick = {
                 addExpenseViewModel.saveExpense(groupId)
+                navigateBack()
             },
+            enabled = isExpenseValid,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
