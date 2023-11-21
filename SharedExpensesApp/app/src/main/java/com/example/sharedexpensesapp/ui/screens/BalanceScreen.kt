@@ -113,7 +113,7 @@ fun DebtCard(debt: Debt, group: GroupItem?, users: Map<String, String>) {
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    "${debt.amount} ${group?.currency}",
+                    "${String.format("%.2f", debt.amount)} ${group?.currency}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(R.color.main_orange)

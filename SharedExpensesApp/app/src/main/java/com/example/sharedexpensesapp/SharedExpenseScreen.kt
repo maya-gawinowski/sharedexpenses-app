@@ -182,6 +182,9 @@ fun SharedExpenseApp() {
             composable(route = SharedExpenseScreen.AddExpense.name) {
                 AddExpenseScreen(
                     groupId = selectedGroup.id,
+                    navigateBack = {
+                        navController.navigate(SharedExpenseScreen.Groups.name)
+                    },
                     modifier = baseModifier,
                 )
             }

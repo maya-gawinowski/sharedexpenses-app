@@ -1,6 +1,5 @@
 package com.example.sharedexpensesapp.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,17 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -32,9 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,12 +40,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedexpensesapp.R
-import com.example.sharedexpensesapp.datasource.RestClient
-import com.example.sharedexpensesapp.datasource.UsersCallback
-import com.example.sharedexpensesapp.model.User
+import com.example.sharedexpensesapp.ui.screens.composables.DropdownIndexed
 import com.example.sharedexpensesapp.utils.CurrencyAmountInputVisualTransformation
-import com.example.sharedexpensesapp.utils.DropDownMenuStateHolder
 import com.example.sharedexpensesapp.utils.ReadonlyTextField
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -59,51 +51,34 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddExpenseScreen(
     groupId: String,
+    navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    currencySymbol: String = "EUR"
+    currencySymbol: String = "EUR",
+    addExpenseViewModel: AddExpenseViewModel = viewModel()
 ) {
 
-    var description by remember { mutableStateOf("") }
-    var amountInput by remember { mutableStateOf("") }
-    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
     val formattedDate by remember {
         derivedStateOf {
-            DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                .format(pickedDate)
+            DateTimeFormatter.ofPattern("dd-MM-yyyy").format(addExpenseViewModel.pickedDate)
+        }
+    }
+    val userNames by remember {
+        derivedStateOf {
+            addExpenseViewModel.participants.value.map { participant: ExpenseParticipant -> participant.name }
+        }
+    }
+    val isExpenseValid by remember {
+        derivedStateOf {
+            addExpenseViewModel.payerId.value != null && addExpenseViewModel.amountInput != ""
         }
     }
     val dateDialogState = rememberMaterialDialogState()
-    var dropDownMenuStateHolder by remember {
-        mutableStateOf(
-            DropDownMenuStateHolder(emptyList())
-        )
-
-    }
-    var participants by remember { mutableStateOf(emptyList<UserListItem>()) }
 
     LaunchedEffect(Unit) {
-        RestClient.instance.getUsers(object : UsersCallback {
-            override fun onSuccess(users: List<User>) {
-                participants = users.map {
-                    UserListItem(
-                        title = it.name,
-                        id = it.id,
-                        isSelected = true,
-                    )
-                }
-                dropDownMenuStateHolder =
-                    DropDownMenuStateHolder(users.map { user -> user.name })
-                Log.d("RestClient", "GET users success $users")
-            }
-
-            override fun onFailure(error: String) {
-                Log.d("RestClient", "GET users error $error")
-            }
-        }, groupId)
+        addExpenseViewModel.fetchUsers(groupId)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -111,25 +86,23 @@ fun AddExpenseScreen(
             painter = painterResource(R.drawable.illustration_sans_titre_35),
             contentDescription = "Fond image",
             contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .matchParentSize()
+            modifier = Modifier.matchParentSize()
         )
     }
     Column(
-        modifier = modifier
-            .padding(16.dp),
+        modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
+            value = addExpenseViewModel.description,
+            onValueChange = { addExpenseViewModel.description = it },
             label = { Text("Expense description") },
             singleLine = true,
         )
         Spacer(Modifier.size(16.dp))
         OutlinedTextField(
-            value = amountInput,
-            onValueChange = { amountInput = it },
+            value = addExpenseViewModel.amountInput,
+            onValueChange = { addExpenseViewModel.amountInput = it },
             label = { Text("Amount") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             visualTransformation = CurrencyAmountInputVisualTransformation(),
@@ -145,41 +118,21 @@ fun AddExpenseScreen(
             Text(text = "Date")
         }
         Spacer(Modifier.size(16.dp))
-        // for some reason extracting this component to a function stops it from updating its state
-        ExposedDropdownMenuBox(
-            expanded = dropDownMenuStateHolder.expanded,
-            onExpandedChange = { dropDownMenuStateHolder.expanded = it }) {
-            OutlinedTextField(
-                value = dropDownMenuStateHolder.value,
-                onValueChange = {},
-                label = { Text(text = "Payed by") },
-                readOnly = true,
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropDownMenuStateHolder.expanded)
-                },
-                placeholder = {
-                    Text(text = "Payed by")
-                },
-                modifier = Modifier.menuAnchor(),
-            )
-            ExposedDropdownMenu(
-                expanded = dropDownMenuStateHolder.expanded,
-                onDismissRequest = { dropDownMenuStateHolder.expanded = false })
-            {
-                dropDownMenuStateHolder.items.forEachIndexed { index, s ->
-                    DropdownMenuItem(
-                        text = { Text(text = s) },
-                        onClick = {
-                            dropDownMenuStateHolder.select(index)
-                        })
-                }
-            }
-        }
+        DropdownIndexed(
+            label = "Payed by",
+            placeholder = "Payed by",
+            items = userNames,
+            onValueChange = {},
+            onIndexSelected = { selectedIndex ->
+                val selectedPayer: ExpenseParticipant =
+                    addExpenseViewModel.participants.value[selectedIndex]
+                addExpenseViewModel.payerId.value = selectedPayer.userId
+            },
+        )
         Spacer(Modifier.size(16.dp))
         Row(
             horizontalArrangement = Arrangement.Start,
-            modifier = Modifier
-                .fillMaxWidth(0.75f)
+            modifier = Modifier.fillMaxWidth(0.75f)
         ) {
             Text(
                 text = "Split among:",
@@ -187,53 +140,22 @@ fun AddExpenseScreen(
             )
         }
         Spacer(Modifier.size(16.dp))
-        LazyColumn(
-            modifier = Modifier
-                .weight(12f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            items(participants.size) { i ->
-                ElevatedCard(
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 6.dp
-                    ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = colorResource(R.color.card_orange),
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .padding(5.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                participants = participants.mapIndexed { j, item ->
-                                    if (i == j) {
-                                        item.copy(isSelected = !item.isSelected)
-                                    } else item
-                                }
-                            }
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(text = participants[i].title)
-                        if (participants[i].isSelected) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Selected",
-                                tint = Color(0xff3b6e44),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        ParticipantsList(
+            participants = addExpenseViewModel.participants.value,
+            onParticipantClicked = { expenseParticipant ->
+                addExpenseViewModel.toggleParticipantSelected(
+                    expenseParticipant
+                )
+            },
+            modifier = Modifier.weight(12f),
+        )
         Spacer(Modifier.size(16.dp))
         Button(
-            onClick = { },
+            onClick = {
+                addExpenseViewModel.saveExpense(groupId)
+                navigateBack()
+            },
+            enabled = isExpenseValid,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -246,24 +168,74 @@ fun AddExpenseScreen(
         }
     }
 
-    MaterialDialog(
-        dialogState = dateDialogState,
-        buttons = {
-            positiveButton(text = "Ok")
-            negativeButton(text = "Cancel")
-        }
-    ) {
+    MaterialDialog(dialogState = dateDialogState, buttons = {
+        positiveButton(text = "Ok")
+        negativeButton(text = "Cancel")
+    }) {
         datepicker(
             initialDate = LocalDate.now(),
             title = "Pick a date",
         ) {
-            pickedDate = it
+            addExpenseViewModel.pickedDate = it
         }
     }
 }
 
-data class UserListItem(
-    val title: String,
-    val id: String,
-    val isSelected: Boolean,
-)
+@Composable
+fun ParticipantsList(
+    participants: List<ExpenseParticipant>,
+    onParticipantClicked: (ExpenseParticipant) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        items(participants) { expenseParticipant ->
+            ParticipantCard(
+                participant = expenseParticipant,
+                checked = expenseParticipant.selected,
+                onClicked = { onParticipantClicked(expenseParticipant) },
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun ParticipantCard(
+    participant: ExpenseParticipant,
+    checked: Boolean,
+    onClicked: () -> Unit,
+) {
+    ElevatedCard(
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 6.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = colorResource(R.color.card_orange),
+        ),
+        modifier = Modifier
+            .fillMaxWidth(0.75f)
+            .padding(5.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(enabled = true, onClick = onClicked)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = participant.name)
+            if (checked) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Selected",
+                    tint = Color(0xff3b6e44),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+    }
+}
