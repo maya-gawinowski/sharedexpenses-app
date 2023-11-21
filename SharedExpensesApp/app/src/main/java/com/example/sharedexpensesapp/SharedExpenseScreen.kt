@@ -41,11 +41,15 @@ import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
 import com.example.sharedexpensesapp.ui.screens.BalanceScreen
 import com.example.sharedexpensesapp.ui.screens.GroupScreen
 import com.example.sharedexpensesapp.ui.screens.JoinGroupScreen
+import com.example.sharedexpensesapp.ui.screens.LogInScreen
 import com.example.sharedexpensesapp.ui.screens.SettingsScreen
+import com.example.sharedexpensesapp.ui.screens.SignInScreen
 import com.example.sharedexpensesapp.ui.screens.WelcomeScreen
 
 
 enum class SharedExpenseScreen(@StringRes val title: Int) {
+    LogIn(title=R.string.log_in),
+    SignIn(title=R.string.sign_in),
     Start(title = R.string.app_name),
     Groups(title = R.string.group_page),
     AddGroup(title = R.string.add_page),
@@ -127,18 +131,35 @@ fun SharedExpenseApp() {
             )
         },
         bottomBar = {
-            if (currentScreen.name != SharedExpenseScreen.Start.name) {
+            if (currentScreen.name != SharedExpenseScreen.Start.name && currentScreen.name != SharedExpenseScreen.LogIn.name && currentScreen.name != SharedExpenseScreen.SignIn.name) {
                 BottomTabs(navController = navController, currentRoute = currentScreen.name)
             }
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = SharedExpenseScreen.Start.name,
+            startDestination = SharedExpenseScreen.LogIn.name,
         ) {
             val baseModifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+            composable(route=SharedExpenseScreen.LogIn.name){
+                LogInScreen(
+                    navigateLogIn = {
+                        navController.navigate(SharedExpenseScreen.Start.name)
+                    },
+                    navigateSignIn = {
+                        navController.navigate(SharedExpenseScreen.SignIn.name)
+                    }
+                )
+            }
+            composable(route=SharedExpenseScreen.SignIn.name){
+                SignInScreen(
+                    navigateSignIn = {
+                        navController.navigate(SharedExpenseScreen.LogIn.name)
+                    }
+                )
+            }
             composable(route = SharedExpenseScreen.Start.name) {
                 WelcomeScreen(
                     onAddGroupButtonClicked = {
@@ -191,6 +212,7 @@ fun SharedExpenseApp() {
         }
     }
 }
+
 
 @Composable
 fun BottomTabs(navController: NavController, currentRoute: String) {
