@@ -1,4 +1,4 @@
-package com.example.sharedexpensesapp.ui.screens
+package com.example.sharedexpensesapp.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.example.sharedexpensesapp.model.GroupUIState

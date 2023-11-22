@@ -10,17 +10,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -35,21 +26,12 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sharedexpensesapp.datasource.DataSource
 import com.example.sharedexpensesapp.model.GroupItem
 import com.example.sharedexpensesapp.model.screens
-import com.example.sharedexpensesapp.ui.screens.AccountScreen
-import com.example.sharedexpensesapp.ui.screens.AddExpenseScreen
-import com.example.sharedexpensesapp.ui.screens.AddGroupScreen
-import com.example.sharedexpensesapp.ui.screens.BalanceScreen
-import com.example.sharedexpensesapp.ui.screens.GroupScreen
-import com.example.sharedexpensesapp.ui.screens.JoinGroupScreen
-import com.example.sharedexpensesapp.ui.screens.LogInScreen
-import com.example.sharedexpensesapp.ui.screens.SettingsScreen
-import com.example.sharedexpensesapp.ui.screens.SignInScreen
-import com.example.sharedexpensesapp.ui.screens.WelcomeScreen
+import com.example.sharedexpensesapp.ui.screens.*
 
 
 enum class SharedExpenseScreen(@StringRes val title: Int) {
-    LogIn(title=R.string.log_in),
-    SignIn(title=R.string.sign_in),
+    LogIn(title = R.string.log_in),
+    SignIn(title = R.string.sign_in),
     Start(title = R.string.app_name),
     Groups(title = R.string.group_page),
     AddGroup(title = R.string.add_page),
@@ -131,7 +113,12 @@ fun SharedExpenseApp() {
             )
         },
         bottomBar = {
-            if (currentScreen.name != SharedExpenseScreen.Start.name && currentScreen.name != SharedExpenseScreen.LogIn.name && currentScreen.name != SharedExpenseScreen.SignIn.name) {
+            val shouldShowBottomBar =
+                currentScreen.name == SharedExpenseScreen.Groups.name ||
+                        currentScreen.name == SharedExpenseScreen.Balance.name ||
+                        currentScreen.name == SharedExpenseScreen.Settings.name
+
+            if (shouldShowBottomBar) {
                 BottomTabs(navController = navController, currentRoute = currentScreen.name)
             }
         }
@@ -143,7 +130,7 @@ fun SharedExpenseApp() {
             val baseModifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-            composable(route=SharedExpenseScreen.LogIn.name){
+            composable(route = SharedExpenseScreen.LogIn.name) {
                 LogInScreen(
                     navigateLogIn = {
                         navController.navigate(SharedExpenseScreen.Start.name)
@@ -153,7 +140,7 @@ fun SharedExpenseApp() {
                     }
                 )
             }
-            composable(route=SharedExpenseScreen.SignIn.name){
+            composable(route = SharedExpenseScreen.SignIn.name) {
                 SignInScreen(
                     navigateSignIn = {
                         navController.navigate(SharedExpenseScreen.LogIn.name)
