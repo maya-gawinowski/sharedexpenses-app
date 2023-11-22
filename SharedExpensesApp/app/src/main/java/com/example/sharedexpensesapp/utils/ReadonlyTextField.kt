@@ -2,7 +2,9 @@ package com.example.sharedexpensesapp.utils
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -20,14 +22,16 @@ fun ReadonlyTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     onClick: () -> Unit,
+    colors: TextFieldColors = TextFieldDefaults.colors(),
     label: @Composable () -> Unit
 ) {
     Box {
-        OutlinedTextField(
+        TextField(
             value = value,
             onValueChange = onValueChange,
             modifier = modifier,
-            label = label
+            label = label,
+            colors = colors
         )
         Box(
             modifier = Modifier
