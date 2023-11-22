@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.model.Debt
 import com.example.sharedexpensesapp.model.GroupItem
+import com.example.sharedexpensesapp.ui.viewmodels.BalanceViewModel
 
 @Composable
 fun BalanceScreen(
@@ -34,12 +35,8 @@ fun BalanceScreen(
 
     LaunchedEffect(Unit) {
         balanceViewModel.fetchDebts(group!!)
+        balanceViewModel.fetchUsers(group)
     }
-
-    LaunchedEffect(Unit) {
-        balanceViewModel.fetchUsers(group!!)
-    }
-
 
     Box(modifier = modifier) {
         Image(

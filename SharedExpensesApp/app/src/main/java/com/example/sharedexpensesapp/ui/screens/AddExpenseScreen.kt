@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.ui.screens.composables.DropdownIndexed
+import com.example.sharedexpensesapp.ui.viewmodels.AddExpenseViewModel
+import com.example.sharedexpensesapp.ui.viewmodels.ExpenseParticipant
 import com.example.sharedexpensesapp.utils.CurrencyAmountInputVisualTransformation
 import com.example.sharedexpensesapp.utils.ReadonlyTextField
 import com.vanpra.composematerialdialogs.MaterialDialog

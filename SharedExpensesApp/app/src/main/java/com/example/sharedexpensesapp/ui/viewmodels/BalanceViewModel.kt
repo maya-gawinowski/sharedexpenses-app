@@ -1,4 +1,4 @@
-package com.example.sharedexpensesapp.ui.screens
+package com.example.sharedexpensesapp.ui.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
