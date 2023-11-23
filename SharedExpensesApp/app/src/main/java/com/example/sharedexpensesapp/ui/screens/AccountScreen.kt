@@ -1,8 +1,12 @@
 package com.example.sharedexpensesapp.ui.screens
-
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.tooling.preview.Preview
-
+import com.example.sharedexpensesapp.utils.createNotificationChannel
+import com.example.sharedexpensesapp.utils.sendNotification
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,6 +33,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 
 @Composable
 fun AccountScreen() {
@@ -89,7 +98,12 @@ fun AccountScreen() {
                 }
 
             }
-
+            Text(
+                text = "Settings",
+                style = TextStyle(fontSize = 30.sp),
+                textAlign = TextAlign.Center,
+                color = colorResource(id = R.color.purple_700),
+            )
             TextField(
                 value = name,
                 onValueChange = { name = it },
@@ -146,6 +160,10 @@ fun AccountScreen() {
                         uncheckedTrackColor =colorResource(id = R.color.purple_500),
                     )
                 )
+
+
+
+
             }
         }
 
@@ -154,3 +172,5 @@ fun AccountScreen() {
     }
 
 }
+
+
