@@ -130,7 +130,7 @@ class RestClient private constructor(){
             }
         })
     }
-    fun createGroups(userIds: List<String>, name: String, currency: String, description: String=""){
+    fun createGroups(userIds: List<String>, name: String, currency: String, description: String="", onSuccess: () -> Unit){
         val url = "http://$host/groups"
         Log.d("RestClient", "POST $url")
         val idsStringify= userIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
@@ -235,4 +235,41 @@ class RestClient private constructor(){
             }
         })
     }
+    fun getUserIdByName(username: String, callback: UserIdCallback) {
+        val url = "http://$host/users/$username"
+        Log.d("RestClient", "GET $url")
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+                callback.onFailure(e.message ?: "Unknown error")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) {
+                        callback.onFailure("Unexpected code $response")
+                        return
+                    }
+
+                    try {
+                        val user = Json.decodeFromString<User>(response.body?.string() ?: "")
+                        callback.onSuccess(user.id)
+                    } catch (e: Exception) {
+                        callback.onFailure("Error parsing response: ${e.message}")
+                    } finally {
+                        response.close()
+                    }
+                }
+            }
+        })
+    }
+}
+
+interface UserIdCallback {
+    fun onSuccess(userId: String)
+    fun onFailure(errorMessage: String)
 }

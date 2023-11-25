@@ -173,6 +173,7 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.AddGroup.name) {
                 AddGroupScreen(
+                    navController = navController,
                     modifier = baseModifier
                 )
             }
@@ -202,6 +203,7 @@ fun SharedExpenseApp() {
         }
     }
 }
+
 
 
 @Composable

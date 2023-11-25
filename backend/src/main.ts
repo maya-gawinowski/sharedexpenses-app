@@ -142,3 +142,13 @@ app.get('/groups/:groupId/users', (req: Request, res: Response) => {
   }
   res.json(group.getUsers());
 });
+app.get('/users/:username', (req, res) => {
+    const username = req.params.username;
+    const user = datasource.getUsers().find(u => u.getName() === username);
+
+    if (!user) {
+        return res.status(404).send('User not found');
+    }
+
+    res.json({ id: user.getId(), name: user.getName() });
+});
