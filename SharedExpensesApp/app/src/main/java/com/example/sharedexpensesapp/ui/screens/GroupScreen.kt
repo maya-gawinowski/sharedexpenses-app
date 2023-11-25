@@ -233,9 +233,3 @@ fun ExpenseCard(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewCreateGroupScreen() {
-    CreateGroupScreen()
-}

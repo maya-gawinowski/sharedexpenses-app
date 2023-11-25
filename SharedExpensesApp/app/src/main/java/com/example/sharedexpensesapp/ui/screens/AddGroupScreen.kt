@@ -32,15 +32,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.sharedexpensesapp.datasource.RestClient
+import com.example.sharedexpensesapp.datasource.UserIdCallback
+import androidx.navigation.NavController
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
-fun AddGroupScreen(modifier: Modifier) {
+fun AddGroupScreen(navController: NavController, modifier: Modifier) {
     var groupName by remember { mutableStateOf(TextFieldValue("")) }
     var groupDescription by remember { mutableStateOf(TextFieldValue("")) }
     var participantName by remember { mutableStateOf("") }
     var participants by remember { mutableStateOf(listOf("You")) }
     var currency by remember { mutableStateOf("EUR") }
     var showCurrencyDropdown by remember { mutableStateOf(false) }
+    var creationComplete by remember { mutableStateOf(false) }
     val currencyOptions = listOf("EUR", "USD", "DKK")
     Column(
         modifier = Modifier
@@ -172,9 +177,42 @@ fun AddGroupScreen(modifier: Modifier) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+        val restClient = RestClient.instance
+        fun getUserIdFromServer(name: String, onResult: (String) -> Unit) {
+            restClient.getUserIdByName(name, object : UserIdCallback {
+                override fun onSuccess(userId: String) {
+                    onResult(userId)
+                }
 
+                override fun onFailure(errorMessage: String) {
+                }
+            })
+        }
+        if (creationComplete) {
+            LaunchedEffect(Unit) {
+                navController.popBackStack()
+            }
+        }
         Button(
-            onClick = { /* Handle create group logic */ },
+            onClick = {
+                val userIds = mutableListOf<String>()
+                participants.forEach { participant ->
+                    if (participant == "You") {
+                        userIds.add("1")
+                    } else {
+                        getUserIdFromServer(participant) { userId ->
+                            userIds.add(userId)
+                        }
+                    }
+                }
+                restClient.createGroups(
+                    userIds = userIds,
+                    name = groupName.text,
+                    currency = currency,
+                    description = groupDescription.text
+                ){
+                    creationComplete = true
+                }},
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
@@ -183,7 +221,7 @@ fun AddGroupScreen(modifier: Modifier) {
         }
     }
 }
-
-
-
-
+interface UserIdCallback {
+    fun onSuccess(userId: String)
+    fun onFailure(errorMessage: String)
+}
