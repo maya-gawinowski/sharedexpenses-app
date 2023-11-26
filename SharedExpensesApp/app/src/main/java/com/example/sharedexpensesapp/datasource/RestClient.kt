@@ -130,7 +130,7 @@ class RestClient private constructor(){
             }
         })
     }
-    fun createGroups(userIds: List<String>, name: String, currency: String, description: String="", onSuccess: () -> Unit){
+    fun createGroups(userIds: List<String>, name: String, currency: String, description: String=""){
         val url = "http://$host/groups"
         Log.d("RestClient", "POST $url")
         val idsStringify= userIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
@@ -297,7 +297,5 @@ class RestClient private constructor(){
 
 }
 
-interface UserIdCallback {
-    fun onSuccess(userId: String)
-    fun onFailure(errorMessage: String)
-}
+
+
