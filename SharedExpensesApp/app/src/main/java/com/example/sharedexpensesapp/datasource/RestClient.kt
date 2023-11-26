@@ -267,6 +267,34 @@ class RestClient private constructor(){
             }
         })
     }
+
+    fun getGroupById(callback: GroupCallback, groupId: String){
+        val url = "http://$host/groups/${groupId}"
+        Log.d("RestClient", "GET $url")
+        val request = Request.Builder()
+            .url(url)
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) callback.onFailure("Unexpected code $response")
+                    try {
+                        val group = Json.decodeFromString<Group>(response.body?.string() ?: "")
+                        callback.onSuccess(group)
+                    } catch (e: Exception) {
+                        callback.onFailure("Error parsing response: ${e.message}")
+                    } finally {
+                        response.close()
+                    }
+                }
+            }
+        })
+    }
+
 }
 
 interface UserIdCallback {
