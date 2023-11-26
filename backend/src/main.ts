@@ -85,6 +85,15 @@ app.post('/groups', (req: Request, res: Response) => {
   res.status(201).json(group);
 });
 
+app.get('/groups/:groupId', (req: Request, res: Response) => {
+  const groupId = req.params.groupId;
+  const group = groups.find((g) => g.getId() === groupId);
+  if (!group) {
+    res.status(404).send('Group not found');
+  }
+  res.json(group);
+});
+
 app.put('/groups/:groupId', (req: Request, res: Response) => {
   const groupId = req.params.groupId;
   const addUserIds = req.body.addUserIds;

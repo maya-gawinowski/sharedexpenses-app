@@ -1,27 +1,28 @@
 package com.example.sharedexpensesapp.ui.viewmodels
 
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.sharedexpensesapp.model.GroupUIState
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import com.example.sharedexpensesapp.datasource.GroupCallback
+import com.example.sharedexpensesapp.datasource.RestClient
+import com.example.sharedexpensesapp.model.Group
 
 class GroupViewModel : ViewModel() {
+    private val _group = mutableStateOf<Group?>(null)
 
-    private val _uiState = MutableStateFlow(GroupUIState())
-    val uiState: StateFlow<GroupUIState> = _uiState.asStateFlow()
+    val group get() = _group.value
 
-    fun updateGroupSelection(group: Int) {
-        val previousGroupSelected = _uiState.value.groupNumber
-        updateItem(group, previousGroupSelected)
+    fun fetchGroup(groupId: String) {
+        RestClient.instance.getGroupById(object: GroupCallback {
+            override fun onSuccess(group: Group) {
+                _group.value = group
+                Log.d("RestClient", "GET group success $_group")
+            }
+
+            override fun onFailure(error: String) {
+                Log.d("RestClient", "GET group error $error")
+            }
+        }, groupId)
     }
 
-    private fun updateItem(group: Int, previousGroup: Int?) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                groupNumber = group
-            )
-        }
-    }
 }
