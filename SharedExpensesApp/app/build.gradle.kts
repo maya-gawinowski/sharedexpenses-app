@@ -76,4 +76,5 @@ dependencies {
     implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation ("com.squareup.okhttp3:okhttp:4.9.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
