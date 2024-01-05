@@ -18,9 +18,19 @@ export class User {
     this._id = this.getNextId(data.id);
   }
 
+  public get forAPI() {
+    return {
+      id: this._id,
+      name: this._name,
+    };
+  }
+
+  public static setNextId(nextId: number) {
+    this.nextId = nextId;
+  }
+
   private getNextId(id?: string) {
     if (id !== undefined) {
-      console.log('id is not undefined');
       return id;
     }
     return (User.nextId++).toString();
@@ -61,5 +71,7 @@ export interface IUser {
   email: string;
   password: string;
 }
+
+export type IUserForAPI = Omit<IUser, 'password' | 'email'>;
 
 export type UserInput = Omit<IUser, 'id'> & { id?: string };

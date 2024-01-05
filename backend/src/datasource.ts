@@ -1,11 +1,13 @@
 import { User } from './user';
 import { Group } from './group';
 
-export class Datasource {
+export class DataSource {
   private _users: User[] = [];
   private _groups: Group[] = [];
 
-  constructor() {
+  public static readonly instance = new DataSource();
+
+  private constructor() {
     this.initializeData();
   }
 

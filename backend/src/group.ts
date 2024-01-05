@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { Debt, Expense } from './model';
-import {User} from "./user";
+import { User, IUserForAPI } from './user';
 
 export class Group {
   private readonly id: string;
-  private users: User[];
+  private users: IUserForAPI[];
   private debts: Debt[] = [];
   private expenses: Expense[] = [];
   private name: string = '';
@@ -14,8 +14,13 @@ export class Group {
 
   private static nextId: number = 0;
 
-  constructor(users: User[], name: string, currency: string, description?: string) {
-    this.users = users;
+  constructor(
+    users: User[],
+    name: string,
+    currency: string,
+    description?: string,
+  ) {
+    this.users = users.map((user) => user.forAPI);
     this.id = Group.nextId.toString();
     Group.nextId += 1;
     this.name = name;
