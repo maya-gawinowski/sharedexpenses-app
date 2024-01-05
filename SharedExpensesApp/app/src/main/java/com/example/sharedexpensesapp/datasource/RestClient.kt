@@ -15,11 +15,19 @@ object RestClient {
     private val mediaType = "application/json; charset=utf-8".toMediaType()
     private var token: String? = null
 
+    private fun authorizationField(): String {
+        if (token == null) {
+            throw Exception("Token not set")
+        }
+        return "Bearer $token"
+    }
+
     fun getGroups(callback: CustomCallback<List<Group>>) {
         val url = "http://$host/groups"
         Log.d("RestClient", "GET $url")
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -329,7 +337,7 @@ object RestClient {
         })
     }
 
-    fun login(email: String, password: String) {
+    fun login(email: String, password: String, callback: CustomCallback<Nothing?>) {
         val url = "http://$host/login"
         Log.d("RestClient", "POST $url")
         val body = """{"email":"$email", "password":"$password"}"""
@@ -350,10 +358,12 @@ object RestClient {
                     try {
                         if (!response.isSuccessful) Log.d("RestClient", "Unexpected code $response")
                         Log.d("RestClient", "Response POST login: ${response.body?.string()}")
-                        val body = Json.decodeFromString<LoginResponse>(response.body?.string() ?: "")
-                        token = body.token
+                        val parsedBody = Json.decodeFromString<LoginResponse>(response.body?.string() ?: "")
+                        token = parsedBody.token
+                        callback.onSuccess(null)
                     } catch (e: Exception) {
                         Log.d("RestClient", "Error parsing response: ${e.message}")
+                        callback.onFailure("Error parsing response: ${e.message}")
                     } finally {
                         response.close()
                     }
