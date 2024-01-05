@@ -19,11 +19,15 @@ app.listen(PORT, () => {
   console.log('Server listening on port:', PORT);
 });
 
+let groups: Group[]
+let users: User[]
 const dataSource = DataSource.instance;
-User.setNextId(dataSource.users.length);
+dataSource.initializeData().then(() => {
+    groups = dataSource.groups
+    users = dataSource.users
+  }
+)
 
-let groups = dataSource.groups;
-const users = dataSource.users;
 
 app.get('/status', (req: Request, res: Response) => {
   const status = {

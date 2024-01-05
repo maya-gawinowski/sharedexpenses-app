@@ -1,5 +1,5 @@
-import { User } from './user';
-import { Group } from './group';
+import {User, UserInput} from './user';
+import {Group} from './group';
 
 export class DataSource {
   private _users: User[] = [];
@@ -8,10 +8,9 @@ export class DataSource {
   public static readonly instance = new DataSource();
 
   private constructor() {
-    this.initializeData();
   }
 
-  private initializeData() {
+  public async initializeData() {
     const names: string[] = [
       'Elena',
       'Marcus',
@@ -24,7 +23,8 @@ export class DataSource {
       'Zara',
       'Mateo',
     ];
-    names.forEach((name) => this._users.push(new User(this.getUserData(name))));
+    const promises = names.map((name) => this.addUser(new User(this.getUserData(name))))
+    await Promise.all(promises);
 
     this._groups.push(
       new Group(this._users, 'Group Choufleur', 'EUR', 'Shopping'),
@@ -60,9 +60,9 @@ export class DataSource {
     });
   }
 
-  private getUserData(name: string) {
+  private getUserData(name: string): UserInput {
     return {
-      name,
+      name: name,
       email: `${name}@example.com`,
       password: 'password',
     };
