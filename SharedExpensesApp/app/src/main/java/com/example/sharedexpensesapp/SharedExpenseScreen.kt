@@ -141,7 +141,7 @@ fun SharedExpenseApp() {
                 )
             }
             composable(route = SharedExpenseScreen.SignIn.name) {
-                SignInScreen(
+                SignUpScreen(
                     navigateSignIn = {
                         navController.navigate(SharedExpenseScreen.LogIn.name)
                     }

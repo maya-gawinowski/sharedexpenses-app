@@ -22,7 +22,7 @@ import com.example.sharedexpensesapp.datasource.CustomCallback
 import com.example.sharedexpensesapp.datasource.RestClient
 
 @Composable
-fun SignInScreen(
+fun SignUpScreen(
     navigateSignIn: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
@@ -119,7 +119,7 @@ fun SignInScreen(
                 .fillMaxWidth()
                 .padding(vertical = 16.dp)
         ) {
-            Text("Sign In")
+            Text("Sign Up")
         }
     }
 }
