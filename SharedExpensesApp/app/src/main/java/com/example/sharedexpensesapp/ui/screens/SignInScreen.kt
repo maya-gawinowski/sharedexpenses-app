@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.sharedexpensesapp.R
+import com.example.sharedexpensesapp.datasource.CustomCallback
 import com.example.sharedexpensesapp.datasource.RestClient
 
 @Composable
@@ -27,7 +28,20 @@ fun SignInScreen(
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var displayMessage by remember {
+        mutableStateOf<String?>(null)
+    }
+    var signupSuccessful by remember {
+        mutableStateOf<Boolean>(false)
+    }
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(key1 = signupSuccessful, block = {
+        if (signupSuccessful) {
+            navigateSignIn()
+        }
+    })
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(R.drawable.illustration_sans_titre_35),
@@ -87,10 +101,19 @@ fun SignInScreen(
                 onDone = { focusManager.clearFocus() }
             )
         )
+        displayMessage?.let { Text(text = it) }
         Button(
             onClick = {
-                RestClient.addNewUser(name, email, password)
-                navigateSignIn()
+                RestClient.addNewUser(name, email, password, object : CustomCallback<Nothing?> {
+                    override fun onSuccess(success: Nothing?) {
+                        displayMessage = null
+                        signupSuccessful = true
+                    }
+
+                    override fun onFailure(error: String) {
+                        displayMessage = error
+                    }
+                })
             },
             modifier = Modifier
                 .fillMaxWidth()
