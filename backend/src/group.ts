@@ -51,7 +51,8 @@ export class Group {
     return this.users;
   }
   public addUsers(newUsers: User[]) {
-    this.users = this.users.concat(newUsers);
+    const newUsersForApi = newUsers.map((user) => user.forAPI)
+    this.users = this.users.concat(newUsersForApi);
     return newUsers;
   }
   public getDebts() {

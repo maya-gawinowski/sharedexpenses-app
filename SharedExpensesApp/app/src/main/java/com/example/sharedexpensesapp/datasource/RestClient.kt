@@ -7,7 +7,6 @@ import com.example.sharedexpensesapp.model.Group
 import com.example.sharedexpensesapp.model.LoginResponse
 import com.example.sharedexpensesapp.model.User
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.Json.Default.decodeFromString
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -16,7 +15,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
-import kotlinx.serialization.decodeFromString
 
 object RestClient {
 
@@ -237,7 +235,7 @@ object RestClient {
         })
     }
 
-    fun addUsersToGroup(groupId: String, userIds: List<String>) {
+    fun addUsersToGroup(groupId: String, userIds: List<String?>) {
         val url = "http://$host/groups/$groupId"
         Log.d("RestClient", "PUT $url")
         val idsStringify =

@@ -34,7 +34,7 @@ export class DataSource {
       new Group(this._users, 'Group Meringue', 'EUR', 'Other expenses'),
     );
     this._groups.push(
-      new Group(this._users, 'Group Souflé', 'EUR', 'Travel expenses again'),
+      new Group([this._users[9]], 'Group Souflé', 'EUR', 'Travel expenses again'),
     );
     const choufleur: Group = this._groups[0];
     choufleur.addExpense({
