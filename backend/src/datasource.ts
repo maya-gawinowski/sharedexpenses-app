@@ -1,83 +1,83 @@
-import {User} from "./user";
-import {Group} from "./group";
+import {User, UserInput} from './user';
+import {Group} from './group';
 
-export class Datasource {
-  private users: User[] = [];
-  private groups: Group[] = [];
+export class DataSource {
+  private _users: User[] = [];
+  private _groups: Group[] = [];
 
-  constructor() {
-    this.initializeData();
+  public static readonly instance = new DataSource();
+
+  private constructor() {
   }
 
-  private initializeData() {
+  public async initializeData() {
     const names: string[] = [
-      "Elena",
-      "Marcus",
-      "Sophie",
-      "Javier",
-      "Aria",
-      "Nolan",
-      "Layla",
-      "Caleb",
-      "Zara",
-      "Mateo"
-    ]
-    names.forEach( name => this.users.push(new User(name)))
+      'Elena',
+      'Marcus',
+      'Sophie',
+      'Javier',
+      'Aria',
+      'Nolan',
+      'Layla',
+      'Caleb',
+      'Zara',
+      'Mateo',
+    ];
+    const promises = names.map((name) => this.addUser(new User(this.getUserData(name))))
+    await Promise.all(promises);
 
-    this.groups.push(new Group(
-      this.users,
-      "Group Choufleur",
-      "EUR",
-      "Shopping")
+    this._groups.push(
+      new Group(this._users, 'Group Choufleur', 'EUR', 'Shopping'),
     );
-    this.groups.push(new Group(
-      this.users,
-      "Group Carotte",
-      "EUR",
-      "Dining")
+    this._groups.push(new Group(this._users, 'Group Carotte', 'EUR', 'Dining'));
+    this._groups.push(
+      new Group(this._users, 'Group Meringue', 'EUR', 'Other expenses'),
     );
-    this.groups.push(new Group(
-      this.users,
-      "Group Meringue",
-      "EUR",
-      "Other expenses")
+    this._groups.push(
+      new Group([this._users[9]], 'Group Souflé', 'EUR', 'Travel expenses again'),
     );
-    this.groups.push(new Group(
-      this.users,
-      "Group Souflé",
-      "EUR",
-      "Travel expenses again")
-    );
-    const choufleur: Group = this.groups[0]
+    const choufleur: Group = this._groups[0];
     choufleur.addExpense({
-      payerId: "1",
-      participantsIds: choufleur.getUsers().map(user => user.getId()),
+      payerId: '1',
+      participantsIds: choufleur.getUsers().map((user) => user.id),
       amount: 100.0,
       date: new Date(),
-      description: "Tickets to the museum"
-    })
+      description: 'Tickets to the museum',
+    });
     choufleur.addExpense({
-      payerId: "1",
-      participantsIds: choufleur.getUsers().map(user => user.getId()),
+      payerId: '1',
+      participantsIds: choufleur.getUsers().map((user) => user.id),
       amount: 120.0,
       date: new Date(),
-      description: "For wine"
-    })
+      description: 'For wine',
+    });
     choufleur.addExpense({
-      payerId: "2",
-      participantsIds: choufleur.getUsers().map(user => user.getId()),
+      payerId: '2',
+      participantsIds: choufleur.getUsers().map((user) => user.id),
       amount: 230.0,
       date: new Date(),
-      description: "Train tickets"
-    })
-
+      description: 'Train tickets',
+    });
   }
 
-  public getUsers() {
-    return this.users;
+  private getUserData(name: string): UserInput {
+    return {
+      name: name,
+      email: `${name}@example.com`,
+      password: 'password',
+    };
   }
 
-  public getGroups() {
-    return this.groups;
+  public get users() {
+    return this._users;
+  }
+
+  public async addUser(user: User) {
+    await user.hashPassword();
+    this._users.push(user);
+  }
+
+  public get groups() {
+    return this._groups;
   }
 }

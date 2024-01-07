@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.example.sharedexpensesapp.datasource.RestClient
 import com.example.sharedexpensesapp.model.User
 import com.example.sharedexpensesapp.ui.viewmodels.GroupParticipant
+
 @Composable
 fun AddGroupScreen(navController: NavController, modifier: Modifier) {
     val addGroupViewModel: AddGroupViewModel = viewModel()
@@ -34,6 +35,10 @@ fun AddGroupScreen(navController: NavController, modifier: Modifier) {
     var currency by remember { mutableStateOf("EUR") }
     var showCurrencyDropdown by remember { mutableStateOf(false) }
     val currencyOptions = listOf("EUR", "USD", "DKK")
+
+    LaunchedEffect(Unit) {
+        addGroupViewModel.addParticipantByName("You")
+    }
 
     Column(
         modifier = Modifier
@@ -174,7 +179,9 @@ fun AddGroupScreen(navController: NavController, modifier: Modifier) {
                     groupDescription = groupDescription.text
                 )
             },
-            modifier = Modifier.fillMaxWidth().height(48.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
         ) {
             Text("Create", color = Color.White)
         }

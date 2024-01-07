@@ -24,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.sharedexpensesapp.datasource.DataSource
+import com.example.sharedexpensesapp.datasource.RestClient
 import com.example.sharedexpensesapp.model.GroupItem
 import com.example.sharedexpensesapp.model.screens
 import com.example.sharedexpensesapp.ui.screens.*
@@ -141,7 +142,7 @@ fun SharedExpenseApp() {
                 )
             }
             composable(route = SharedExpenseScreen.SignIn.name) {
-                SignInScreen(
+                SignUpScreen(
                     navigateSignIn = {
                         navController.navigate(SharedExpenseScreen.LogIn.name)
                     }
@@ -179,6 +180,10 @@ fun SharedExpenseApp() {
             }
             composable(route = SharedExpenseScreen.Join.name) {
                 JoinGroupScreen(
+                    onJoinGroupClicked = { groupId ->
+                        RestClient.addUsersToGroup(groupId, listOf(RestClient.getCurrentUserId()))
+                        navController.navigate(SharedExpenseScreen.Start.name)
+                    },
                     modifier = baseModifier
                 )
             }
@@ -203,7 +208,6 @@ fun SharedExpenseApp() {
         }
     }
 }
-
 
 
 @Composable
