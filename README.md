@@ -1,3 +1,13 @@
+# Note on the demo data
+After launching the app, you can log as one of the demo users:
+#### Elena
+- email: `Elena@example.com`
+- password: `password`
+- Elena has access to all four demo groups. Group "Choufleur" contains some example expenses
+#### Mateo
+- email: `Mateo@example.com`
+- password: `password`
+- Mateo has access to three groups. To demonstrate joing a group, go to _Join Group_ screen and enter code `3` in the textfield. Click the button and you will gain access to the group "Souflé" 
 # Frontend
 ## API Methods using the RestClient
 Kotlin code that allows to post data into the backend
