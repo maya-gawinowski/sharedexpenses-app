@@ -17,10 +17,7 @@
         android:theme="@style/Theme.SharedExpensesApp"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <service
-            android:name=".MyService"
-            android:enabled="true"
-            android:exported="true"></service>
+
 
         <activity
             android:name=".MainActivity"
@@ -34,8 +31,9 @@
         </activity>
 
         <service
-            android:name=".services.MyFirebaseMessagingService"
-            android:exported="false">
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false"
+            tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
