@@ -38,6 +38,38 @@ import androidx.core.app.NotificationManagerCompat
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
+@Composable
+fun NotificationsToggle(
+    notificationsEnabled: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            "Receive Notifications",
+            modifier = Modifier.alignByBaseline(),
+            style = TextStyle(fontSize = 30.sp),
+            textAlign = TextAlign.Center,
+            color = colorResource(id = R.color.purple_700),
+        )
+        Spacer(modifier = Modifier.width(15.dp))
+        Switch(
+            checked = notificationsEnabled,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = colorResource(id = R.color.purple_200),
+                uncheckedThumbColor = colorResource(id = R.color.purple_500),
+                checkedTrackColor = colorResource(id = R.color.purple_700),
+                uncheckedTrackColor = colorResource(id = R.color.purple_500),
+            )
+        )
+    }
+}
 
 @Composable
 fun AccountScreen() {
@@ -58,7 +90,6 @@ fun AccountScreen() {
             modifier = Modifier.matchParentSize()
         )
 
-        // Input Fields
         Column(
             modifier = Modifier
                 .fillMaxSize(),
@@ -136,35 +167,11 @@ fun AccountScreen() {
                 )
             )
 
-            // Toggle Button for Notifications
             Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Receive Notifications", modifier = Modifier.alignByBaseline() ,
-                        style = TextStyle(fontSize = 30.sp),
-                    textAlign = TextAlign.Center,
-                    color = colorResource(id = R.color.purple_700),)
-                Spacer(modifier = Modifier.width(15.dp))
-                Switch(
-                    checked = notificationsEnabled,
-                    onCheckedChange = { notificationsEnabled = it },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = colorResource(id = R.color.purple_200),
-                        uncheckedThumbColor = colorResource(id = R.color.purple_500),
-                        checkedTrackColor = colorResource(id = R.color.purple_700),
-                        uncheckedTrackColor =colorResource(id = R.color.purple_500),
-                    )
-                )
-
-
-
-
-            }
+            NotificationsToggle(
+                notificationsEnabled = notificationsEnabled,
+                onCheckedChange = { notificationsEnabled = it }
+            )
         }
 
 
