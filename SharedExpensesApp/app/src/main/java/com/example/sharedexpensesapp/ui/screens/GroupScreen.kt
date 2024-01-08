@@ -1,6 +1,5 @@
 package com.example.sharedexpensesapp.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,74 +20,45 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedexpensesapp.R
-import com.example.sharedexpensesapp.datasource.ExpensesCallback
-import com.example.sharedexpensesapp.datasource.RestClient
-import com.example.sharedexpensesapp.datasource.UsersCallback
-import com.example.sharedexpensesapp.model.Expense
 import com.example.sharedexpensesapp.model.ExpenseItem
-import com.example.sharedexpensesapp.model.GroupItem
-import com.example.sharedexpensesapp.model.User
+import com.example.sharedexpensesapp.model.Group
+import com.example.sharedexpensesapp.ui.viewmodels.GroupViewModel
 import com.example.sharedexpensesapp.utils.GroupMapper
 
 @Composable
 fun GroupScreen(
-    selectedGroup: GroupItem?,
+    selectedGroupId: String,
     modifier: Modifier = Modifier,
     onAddExpenseButtonClicked: () -> Unit,
+    groupViewModel: GroupViewModel = viewModel()
 ) {
 
-    var receivedExpenses by remember { mutableStateOf(emptyList<Expense>()) }
     val receivedExpensesItems by remember {
         derivedStateOf {
-            receivedExpenses.map { expense -> GroupMapper.mapToExpenseItem(expense) }
+            groupViewModel.group?.expenses?.map { expense -> GroupMapper.mapToExpenseItem(expense) }
+                ?: emptyList()
         }
     }
-    var receivedUsers by remember { mutableStateOf(emptyList<User>()) }
     val receivedUsersMap by remember {
         derivedStateOf {
-            receivedUsers.associate { it.id to it.name }
+            groupViewModel.group?.users?.associate { it.id to it.name } ?: emptyMap()
         }
     }
 
     LaunchedEffect(Unit) {
-        RestClient.instance.getExpenses(object : ExpensesCallback {
-            override fun onSuccess(expenses: List<Expense>) {
-                receivedExpenses = expenses
-                Log.d("RestClient", "GET expenses success $receivedExpenses")
-            }
-
-            override fun onFailure(error: String) {
-                Log.d("RestClient", "GET expenses error $error")
-            }
-        }, selectedGroup!!.id)
+        groupViewModel.fetchGroup(groupId = selectedGroupId)
     }
-
-    LaunchedEffect(Unit) {
-        RestClient.instance.getUsers(object : UsersCallback {
-            override fun onSuccess(users: List<User>) {
-                receivedUsers = users
-                Log.d("RestClient", "GET users success $receivedUsers")
-            }
-
-            override fun onFailure(error: String) {
-                Log.d("RestClient", "GET users error $error")
-            }
-        }, selectedGroup!!.id)
-    }
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -102,12 +72,12 @@ fun GroupScreen(
     Column(
         modifier = modifier,
     ) {
-        ExpenseBar(selectedGroup = selectedGroup, modifier = modifier.fillMaxWidth())
+        ExpenseBar(selectedGroup = groupViewModel.group, modifier = modifier.fillMaxWidth())
         LazyColumn(modifier = Modifier.weight(50f)) {
             items(receivedExpensesItems) { expenseItem ->
                 ExpenseCard(
                     expense = expenseItem,
-                    selectedGroup = selectedGroup,
+                    selectedGroup = groupViewModel.group,
                     users = receivedUsersMap
                 )
             }
@@ -138,7 +108,7 @@ fun GroupScreen(
 
 @Composable
 fun ExpenseBar(
-    selectedGroup: GroupItem?,
+    selectedGroup: Group?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -157,7 +127,12 @@ fun ExpenseBar(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "${String.format("%.2f", selectedGroup?.balance)} ${selectedGroup?.currency}",
+                text = "${
+                    String.format(
+                        "%.2f",
+                        selectedGroup?.balance
+                    )
+                } ${selectedGroup?.currency}",
                 color = Color.White,
                 fontSize = 25.sp
             )
@@ -172,7 +147,12 @@ fun ExpenseBar(
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "${String.format("%.2f", selectedGroup?.balance)} ${selectedGroup?.currency}",
+                text = "${
+                    String.format(
+                        "%.2f",
+                        selectedGroup?.balance
+                    )
+                } ${selectedGroup?.currency}",
                 color = Color.White
             )
         }
@@ -184,7 +164,7 @@ fun ExpenseBar(
 fun ExpenseCard(
     modifier: Modifier = Modifier,
     expense: ExpenseItem,
-    selectedGroup: GroupItem?,
+    selectedGroup: Group?,
     users: Map<String, String>
 ) {
     ElevatedCard(
@@ -232,10 +212,4 @@ fun ExpenseCard(
 
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewCreateGroupScreen() {
-    CreateGroupScreen()
 }

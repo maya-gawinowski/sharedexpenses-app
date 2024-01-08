@@ -22,8 +22,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -43,6 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sharedexpensesapp.R
 import com.example.sharedexpensesapp.ui.screens.composables.DropdownIndexed
+import com.example.sharedexpensesapp.ui.viewmodels.AddExpenseViewModel
+import com.example.sharedexpensesapp.ui.viewmodels.ExpenseParticipant
 import com.example.sharedexpensesapp.utils.CurrencyAmountInputVisualTransformation
 import com.example.sharedexpensesapp.utils.ReadonlyTextField
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -59,7 +62,6 @@ fun AddExpenseScreen(
     currencySymbol: String = "EUR",
     addExpenseViewModel: AddExpenseViewModel = viewModel()
 ) {
-
     val formattedDate by remember {
         derivedStateOf {
             DateTimeFormatter.ofPattern("dd-MM-yyyy").format(addExpenseViewModel.pickedDate)
@@ -77,6 +79,10 @@ fun AddExpenseScreen(
     }
     val dateDialogState = rememberMaterialDialogState()
 
+    val customTextFieldColors = TextFieldDefaults.colors(
+        unfocusedContainerColor = colorResource(R.color.card_orange),
+    )
+
     LaunchedEffect(Unit) {
         addExpenseViewModel.fetchUsers(groupId)
     }
@@ -93,14 +99,15 @@ fun AddExpenseScreen(
         modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        OutlinedTextField(
+        TextField(
             value = addExpenseViewModel.description,
             onValueChange = { addExpenseViewModel.description = it },
             label = { Text("Expense description") },
             singleLine = true,
+            colors = customTextFieldColors
         )
         Spacer(Modifier.size(16.dp))
-        OutlinedTextField(
+        TextField(
             value = addExpenseViewModel.amountInput,
             onValueChange = { addExpenseViewModel.amountInput = it },
             label = { Text("Amount") },
@@ -108,12 +115,14 @@ fun AddExpenseScreen(
             visualTransformation = CurrencyAmountInputVisualTransformation(),
             suffix = { Text(currencySymbol) },
             singleLine = true,
+            colors = customTextFieldColors
         )
         Spacer(Modifier.size(16.dp))
         ReadonlyTextField(
             value = TextFieldValue(formattedDate),
             onValueChange = {},
             onClick = { dateDialogState.show() },
+            colors = customTextFieldColors
         ) {
             Text(text = "Date")
         }
@@ -128,6 +137,7 @@ fun AddExpenseScreen(
                     addExpenseViewModel.participants.value[selectedIndex]
                 addExpenseViewModel.payerId.value = selectedPayer.userId
             },
+            colors = customTextFieldColors
         )
         Spacer(Modifier.size(16.dp))
         Row(

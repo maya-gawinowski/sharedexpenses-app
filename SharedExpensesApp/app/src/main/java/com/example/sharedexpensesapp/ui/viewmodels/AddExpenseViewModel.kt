@@ -1,14 +1,10 @@
-package com.example.sharedexpensesapp.ui.screens
+package com.example.sharedexpensesapp.ui.viewmodels
 
 import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
+import com.example.sharedexpensesapp.datasource.CustomCallback
 import com.example.sharedexpensesapp.datasource.RestClient
-import com.example.sharedexpensesapp.datasource.UsersCallback
 import com.example.sharedexpensesapp.model.User
 import java.time.LocalDate
 
@@ -31,7 +27,7 @@ class AddExpenseViewModel : ViewModel() {
         }
 
     fun fetchUsers(groupId: String) {
-        RestClient.instance.getUsers(object : UsersCallback {
+        RestClient.getUsers(object : CustomCallback<List<User>> {
             override fun onSuccess(users: List<User>) {
                 _participants.value = users.map { user: User ->
                     ExpenseParticipant(
@@ -40,6 +36,7 @@ class AddExpenseViewModel : ViewModel() {
                     )
                 }
             }
+
             override fun onFailure(error: String) {
                 Log.d("RestClient", "GET users error $error")
             }
@@ -47,7 +44,7 @@ class AddExpenseViewModel : ViewModel() {
     }
 
     fun saveExpense(groupId: String) {
-        RestClient.instance.addExpense(
+        RestClient.addExpense(
             groupId = groupId,
             payerId = payerId.value!!,
             participantsIds = participants.value

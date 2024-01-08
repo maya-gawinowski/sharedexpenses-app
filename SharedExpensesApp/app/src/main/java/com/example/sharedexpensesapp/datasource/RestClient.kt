@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.sharedexpensesapp.model.Debt
 import com.example.sharedexpensesapp.model.Expense
 import com.example.sharedexpensesapp.model.Group
+import com.example.sharedexpensesapp.model.LoginResponse
 import com.example.sharedexpensesapp.model.User
 import kotlinx.serialization.json.Json
 import okhttp3.Call
@@ -15,18 +16,31 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 
-class RestClient private constructor(){
-    companion object{
-        val instance = RestClient()
-    }
+object RestClient {
+
     private val client = OkHttpClient()
     private val host = "10.0.2.2:3000"
     private val mediaType = "application/json; charset=utf-8".toMediaType()
-    fun getGroups(callback: GroupsCallback){
+    private var token: String? = null
+    private var userId: String? = null
+
+    private fun authorizationField(): String {
+        if (token == null) {
+            throw Exception("Token not set")
+        }
+        return "Bearer $token"
+    }
+
+    fun getCurrentUserId(): String? {
+        return userId
+    }
+
+    fun getGroups(callback: CustomCallback<List<Group>>) {
         val url = "http://$host/groups"
         Log.d("RestClient", "GET $url")
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -38,7 +52,8 @@ class RestClient private constructor(){
                     if (!response.isSuccessful) callback.onFailure("Unexpected code $response")
 
                     try {
-                        val groups = Json.decodeFromString<List<Group>>(response.body?.string() ?: "")
+                        val groups =
+                            Json.decodeFromString<List<Group>>(response.body?.string() ?: "")
                         callback.onSuccess(groups)
                     } catch (e: Exception) {
                         callback.onFailure("Error parsing response: ${e.message}")
@@ -50,11 +65,12 @@ class RestClient private constructor(){
         })
     }
 
-    fun getExpenses(callback: ExpensesCallback, groupId: String){
+    fun getExpenses(callback: CustomCallback<List<Expense>>, groupId: String) {
         val url = "http://$host/groups/${groupId}/expenses"
         Log.d("RestClient", "GET $url")
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -65,7 +81,8 @@ class RestClient private constructor(){
                 response.use {
                     if (!response.isSuccessful) callback.onFailure("Unexpected code $response")
                     try {
-                        val expenses = Json.decodeFromString<List<Expense>>(response.body?.string() ?: "")
+                        val expenses =
+                            Json.decodeFromString<List<Expense>>(response.body?.string() ?: "")
                         callback.onSuccess(expenses)
                     } catch (e: Exception) {
                         callback.onFailure("Error parsing response: ${e.message}")
@@ -77,11 +94,12 @@ class RestClient private constructor(){
         })
     }
 
-    fun getDebts(callback: DebtsCallback, groupId: String){
+    fun getDebts(callback: CustomCallback<List<Debt>>, groupId: String) {
         val url = "http://$host/groups/${groupId}/debts"
         Log.d("RestClient", "GET $url")
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -104,11 +122,12 @@ class RestClient private constructor(){
         })
     }
 
-    fun getUsers(callback: UsersCallback, groupId: String){
+    fun getUsers(callback: CustomCallback<List<User>>, groupId: String) {
         val url = "http://$host/groups/${groupId}/users"
         Log.d("RestClient", "GET $url")
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -130,13 +149,22 @@ class RestClient private constructor(){
             }
         })
     }
-    fun createGroups(userIds: List<String>, name: String, currency: String, description: String=""){
+
+    fun createGroups(
+        userIds: List<String>,
+        name: String,
+        currency: String,
+        description: String = ""
+    ) {
         val url = "http://$host/groups"
         Log.d("RestClient", "POST $url")
-        val idsStringify= userIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
-        val body = """{"userIds":${idsStringify},"name":"$name", "currency":"$currency","description":"$description"}"""
+        val idsStringify =
+            userIds.joinToString(separator = "\",\"", prefix = "[\"", postfix = "\"]")
+        val body =
+            """{"userIds":${idsStringify},"name":"$name", "currency":"$currency","description":"$description"}"""
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .post(body.toRequestBody(mediaType))
             .build()
         client.newCall(request).enqueue(object : Callback {
@@ -146,19 +174,30 @@ class RestClient private constructor(){
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
-                    if (!response.isSuccessful) Log.d("RestClient","Unexpected code $response")
+                    if (!response.isSuccessful) Log.d("RestClient", "Unexpected code $response")
                     Log.d("RestClient", "Response POST group: ${response.body?.string()}")
                 }
             }
         })
     }
-    fun addExpense(groupId: String, payerId:String,participantsIds:List<String>, amount:Double, date:String, description: String=""){
+
+    fun addExpense(
+        groupId: String,
+        payerId: String,
+        participantsIds: List<String>,
+        amount: Double,
+        date: String,
+        description: String = ""
+    ) {
         val url = "http://$host/groups/$groupId/expenses"
-        val idsStringify= participantsIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
-        val body = """{"payerId":"$payerId", "participantsIds":$idsStringify, "amount":$amount, "date":"$date", "description":"$description"}"""
+        val idsStringify =
+            participantsIds.joinToString(separator = "\",\"", prefix = "[\"", postfix = "\"]")
+        val body =
+            """{"payerId":"$payerId", "participantsIds":$idsStringify, "amount":$amount, "date":"$date", "description":"$description"}"""
         Log.d("RestClient", "POST $url")
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .post(body.toRequestBody(mediaType))
             .build()
         client.newCall(request).enqueue(object : Callback {
@@ -168,16 +207,18 @@ class RestClient private constructor(){
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
-                    if (!response.isSuccessful) Log.d("RestClient","Unexpected code $response")
+                    if (!response.isSuccessful) Log.d("RestClient", "Unexpected code $response")
                     Log.d("RestClient", "Response POST add expenses: ${response.body?.string()}")
                 }
             }
         })
     }
-    fun deleteGroup(groupId:String){
+
+    fun deleteGroup(groupId: String) {
         val url = "http://$host/groups/$groupId"
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .delete()
             .build()
         client.newCall(request).enqueue(object : Callback {
@@ -187,25 +228,29 @@ class RestClient private constructor(){
 
             override fun onResponse(call: Call, response: Response) {
                 response.use {
-                    if (!response.isSuccessful) Log.d("RestClient","Unexpected code $response")
+                    if (!response.isSuccessful) Log.d("RestClient", "Unexpected code $response")
                     Log.d("RestClient", "Response DELETE group: ${response.body?.string()}")
                 }
             }
         })
     }
-    fun addUsersToGroup(groupId: String, userIds: List<String>){
+
+    fun addUsersToGroup(groupId: String, userIds: List<String?>) {
         val url = "http://$host/groups/$groupId"
         Log.d("RestClient", "PUT $url")
-        val idsStringify= userIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
+        val idsStringify =
+            userIds.joinToString(separator = "\",\"", prefix = "[\"", postfix = "\"]")
         val body = """{"addUserIds":$idsStringify}"""
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .put(body.toRequestBody(mediaType))
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
             }
+
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) Log.d("RestClient", "Unexpected code $response")
@@ -214,19 +259,23 @@ class RestClient private constructor(){
             }
         })
     }
-    fun removeUsersFromGroup(groupId: String, userIds: List<String>){
+
+    fun removeUsersFromGroup(groupId: String, userIds: List<String>) {
         val url = "http://$host/groups/$groupId"
         Log.d("RestClient", "PUT $url")
-        val idsStringify= userIds.joinToString(separator = "\",\"", prefix="[\"", postfix = "\"]")
+        val idsStringify =
+            userIds.joinToString(separator = "\",\"", prefix = "[\"", postfix = "\"]")
         val body = """{"removeUserIds":$idsStringify}"""
         val request = Request.Builder()
             .url(url)
+            .header("Authorization", authorizationField())
             .put(body.toRequestBody(mediaType))
             .build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
             }
+
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) Log.d("RestClient", "Unexpected code $response")
@@ -235,4 +284,148 @@ class RestClient private constructor(){
             }
         })
     }
+
+    fun getUserIdByName(username: String, callback: CustomCallback<String>) {
+        val url = "http://$host/users/$username"
+        Log.d("RestClient", "GET $url")
+        val request = Request.Builder()
+            .url(url)
+            .header("Authorization", authorizationField())
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+                callback.onFailure(e.message ?: "Unknown error")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) {
+                        callback.onFailure("Unexpected code $response")
+                        return
+                    }
+
+                    try {
+                        val user = Json.decodeFromString<User>(response.body?.string() ?: "")
+                        callback.onSuccess(user.id)
+                    } catch (e: Exception) {
+                        callback.onFailure("Error parsing response: ${e.message}")
+                    } finally {
+                        response.close()
+                    }
+                }
+            }
+        })
+    }
+
+    fun getGroupById(callback: CustomCallback<Group>, groupId: String) {
+        val url = "http://$host/groups/${groupId}"
+        Log.d("RestClient", "GET $url")
+        val request = Request.Builder()
+            .url(url)
+            .header("Authorization", authorizationField())
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) callback.onFailure("Unexpected code $response")
+                    try {
+                        val group = Json.decodeFromString<Group>(response.body?.string() ?: "")
+                        callback.onSuccess(group)
+                    } catch (e: Exception) {
+                        callback.onFailure("Error parsing response: ${e.message}")
+                    } finally {
+                        response.close()
+                    }
+                }
+            }
+        })
+    }
+
+    fun addNewUser(
+        name: String,
+        email: String,
+        password: String,
+        callback: CustomCallback<Nothing?>
+    ) {
+        val url = "http://$host/users"
+        Log.d("RestClient", "POST $url")
+        val body = """{"name":"$name", "email":"$email", "password":"$password"}"""
+        val request = Request.Builder()
+            .url(url)
+            .post(
+                body.toRequestBody(mediaType)
+            )
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.d("RestClient", "Error: ${e.message}")
+                e.printStackTrace()
+                callback.onFailure(e.message ?: "Unknown error")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    try {
+                        if (!response.isSuccessful) {
+                            throw Exception("Unexpected code: ${response.code}")
+                        }
+                        Log.d("RestClient", "Response POST add user: ${response.body?.string()}")
+                        callback.onSuccess(null)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        callback.onFailure(e.message ?: "Unknown error")
+                    } finally {
+                        response.close()
+                    }
+                }
+            }
+        })
+    }
+
+    fun login(email: String, password: String, callback: CustomCallback<Nothing?>) {
+        val url = "http://$host/login"
+        Log.d("RestClient", "POST $url")
+        val body = """{"email":"$email", "password":"$password"}"""
+        val request = Request.Builder()
+            .url(url)
+            .post(
+                body.toRequestBody(mediaType)
+            )
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.d("RestClient", "Error: ${e.message}")
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    try {
+                        if (!response.isSuccessful) {
+                            throw Exception(response.message)
+                        }
+                        val parsedBody =
+                            Json.decodeFromString<LoginResponse>(response.body?.string() ?: "")
+                        token = parsedBody.token
+                        userId = parsedBody.userId
+                        callback.onSuccess(null)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        callback.onFailure(e.message ?: "Unknown error")
+                    } finally {
+                        response.close()
+                    }
+                }
+            }
+        })
+    }
 }
+
+
+

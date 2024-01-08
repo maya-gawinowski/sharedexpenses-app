@@ -10,8 +10,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -32,7 +34,8 @@ fun DropdownIndexed(
     items: List<String>,
     onValueChange: (textFieldValue: String) -> Unit,
     onIndexSelected: (selectedIndex: Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    colors: TextFieldColors = TextFieldDefaults.colors()
 ) {
     var isDropDownExpanded by remember { mutableStateOf(false) }
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
@@ -46,7 +49,7 @@ fun DropdownIndexed(
         onExpandedChange = { isDropDownExpanded = !isDropDownExpanded },
         modifier = modifier
     ) {
-        OutlinedTextField(
+        TextField(
             value = displayedValue,
             onValueChange = onValueChange,
             label = { Text(text = label) },
@@ -62,6 +65,7 @@ fun DropdownIndexed(
             trailingIcon = {
                 Icon(icon, "Description")
             },
+            colors = colors,
         )
         DropdownMenu(
             modifier = Modifier
