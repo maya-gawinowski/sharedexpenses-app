@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "964611099404",
+    "project_id": "sharedexpenses-d1863",
+    "storage_bucket": "sharedexpenses-d1863.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:964611099404:android:82ce3f0448775fb80f1729",
+        "android_client_info": {
+          "package_name": "com.example.sharedexpensesapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOpX2X4q-akqyQlbMpmb4OXMlZc0nCFA4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

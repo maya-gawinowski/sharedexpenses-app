@@ -9,10 +9,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.sharedexpensesapp.ui.theme.SharedExpensesAppTheme
-
+import com.google.firebase.FirebaseApp
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         setContent {
             SharedExpensesAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -24,5 +25,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
 }

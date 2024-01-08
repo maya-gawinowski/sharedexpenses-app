@@ -205,6 +205,8 @@ fun SharedExpenseApp() {
             composable(route = SharedExpenseScreen.Settings.name) {
                 SettingsScreen(modifier = baseModifier)
             }
+
+
         }
     }
 }
@@ -218,6 +220,7 @@ fun BottomTabs(navController: NavController, currentRoute: String) {
             BottomNavigationItem(
                 selected = selected,
                 onClick = {
+
                     navController.navigate(screen.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true

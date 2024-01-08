@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
+    id("com.google.gms.google-services")
 }
 android {
     namespace = "com.example.sharedexpensesapp"
@@ -75,6 +76,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     implementation("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation ("com.squareup.okhttp3:okhttp:4.9.1")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
 }
