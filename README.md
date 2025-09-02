@@ -1,9 +1,26 @@
+This project is a shared expense Application built with Jetpack Compose and Kotlin. The goal is to design and implement a mobile app that allows users to easily join groups, add and follow group expenses.
+
+✨ Features
+
+Join Groups – Easily join existing groups to start tracking expenses together.
+
+Create Groups – Set up new groups for trips, events, or daily expenses.
+
+Add Expenses – Record group expenses and define who needs to pay back.
+
+Expense Details – View detailed breakdowns of expenses within a group.
+
+Group Balance – Check the overall balance and see who owes whom.
+
+
+[Mockups](https://www.figma.com/design/w6nuDJLi9Ji6DvlGwHkB5z/ShareMoneyApp?node-id=77-2&t=bcoBByW99dfrW3fm-1) (Figma)
+
 # Note on the demo data
 After launching the app, you can log as one of the demo users:
 #### Elena
 - email: `Elena@example.com`
 - password: `password`
-- Elena has access to three groups. To demonstrate joing a group, go to _Join Group_ screen and enter code `3` in the textfield. Click the button and you will gain access to the group "Souflé"
+- Elena has access to three groups. To demonstrate joining a group, go to _Join Group_ screen and enter code `3` in the textfield. Click the button and you will gain access to the group "Souflé"
 #### Mateo
 - email: `Mateo@example.com`
 - password: `password`
